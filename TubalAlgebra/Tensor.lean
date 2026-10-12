@@ -224,7 +224,9 @@ matrices). -/
 theorem isStarMLinear_comp [Fact (Admissible M)] {m p l : ℕ}
     (T : (Fin p → KM M) → (Fin m → KM M)) (S : (Fin l → KM M) → (Fin p → KM M))
     (hT : IsStarMLinear T) (hS : IsStarMLinear S) : IsStarMLinear (T ∘ S) := by
-  sorry
+  intro U V r s
+  simp only [Function.comp_apply]
+  rw [hS, hT]
 
 /-- "Composition of `⋆_M`-linear functions is `⋆_M`-linear" (for functions between matrices
 `ℝ^{l×n} → ℝ^{p×n} → ℝ^{m×n}`). -/
@@ -232,7 +234,17 @@ theorem isStarMLinearMat_comp (M : Matrix (Fin n) (Fin n) ℂ) [Fact (Admissible
     (S₁ : Matrix (Fin p) (Fin n) ℝ → Matrix (Fin m) (Fin n) ℝ)
     (S₂ : Matrix (Fin l) (Fin n) ℝ → Matrix (Fin p) (Fin n) ℝ)
     (h₁ : IsStarMLinearMat M S₁) (h₂ : IsStarMLinearMat M S₂) : IsStarMLinearMat M (S₁ ∘ S₂) := by
-  sorry
+  have h : ((twist : Matrix (Fin m) (Fin n) ℝ → Fin m → KM M) ∘ (S₁ ∘ S₂) ∘
+        (squeeze : (Fin l → KM M) → Matrix (Fin l) (Fin n) ℝ)) =
+      ((twist : Matrix (Fin m) (Fin n) ℝ → Fin m → KM M) ∘ S₁ ∘
+        (squeeze : (Fin p → KM M) → Matrix (Fin p) (Fin n) ℝ)) ∘
+        ((twist : Matrix (Fin p) (Fin n) ℝ → Fin p → KM M) ∘ S₂ ∘
+          (squeeze : (Fin l → KM M) → Matrix (Fin l) (Fin n) ℝ)) := by
+    funext U
+    simp only [Function.comp_apply, squeeze_twist]
+  unfold IsStarMLinearMat
+  rw [h]
+  exact isStarMLinear_comp _ _ h₁ h₂
 
 /-- Section 5.1: with scalar multiplication by tubes (element-wise) and the `⋆_M`-Hermitian
 transpose, the tensors `𝕂_M^{m×m}` form a `*`-algebra over `𝕂_M`: the `*`-algebra axioms
@@ -247,7 +259,12 @@ theorem tensor_starAlgebra [Fact (Admissible M)] (m : ℕ) :
     (∀ (r : KM M) (A : Matrix (Fin m) (Fin m) (KM M)) i j, (r • A) i j = r * A i j) ∧
     (∀ (r : KM M) (A B : Matrix (Fin m) (Fin m) (KM M)), r • (A * B) = (r • A) * B ∧
       r • (A * B) = A * (r • B)) := by
-  sorry
+  refine ⟨fun A => conjTranspose_conjTranspose A, fun A B => conjTranspose_add A B,
+    fun A B => conjTranspose_mul A B, conjTranspose_one, fun r A => ?_, fun r A i j => rfl,
+    fun r A B => ⟨(Matrix.smul_mul r A B).symm, (Matrix.mul_smul A r B).symm⟩⟩
+  refine Matrix.ext fun i j => ?_
+  change star (r * A j i) = star r * star (A j i)
+  rw [star_mul, mul_comm]
 
 /-- "For every compatibly sized `𝒜` and `ℬ` we have `(𝒜 ⋆_M ℬ)ᴴ = ℬᴴ ⋆_M 𝒜ᴴ`." -/
 theorem conjTranspose_tensor_mul [Fact (Admissible M)] {m p l : ℕ}
