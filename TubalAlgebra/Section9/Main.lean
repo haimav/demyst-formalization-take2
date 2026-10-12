@@ -34,6 +34,22 @@ theorem theorem11_admissible (T : TubalRing n) :
       ∀ a b : Fin n → ℝ, toC (T.mul a b) = starMC M (toC a) (toC b) := by
   sorry
 
+/-- Section 9 preamble: "we denote … by `a⁻` the unique element for which `a = a·a⁻·a` and
+`a⁻ = a⁻·a·a⁻`, eschewing the previous definition in Eq. (7) … Once we prove Theorem 11 the
+two definitions coincide": if `a · b = M⁻¹ (M a • M b)` for an invertible `M` (as provided by
+Theorem 11), then `a⁻ = M⁻¹ (M a)⁺`. -/
+theorem TubalRing.winv_eq_eq7 (T : TubalRing n) (M : Matrix (Fin n) (Fin n) ℂ) (hM : IsUnit M)
+    (hT : ∀ a b : Fin n → ℝ, toC (T.mul a b) = starMC M (toC a) (toC b)) (a : Fin n → ℝ) :
+    toC (T.winv a) = M⁻¹ *ᵥ pinvVec (M *ᵥ toC a) := by
+  sorry
+
+/-- The two definitions of the weak inverse coincide for every tubal ring: with `M` from
+Theorem 11. -/
+theorem TubalRing.exists_winv_eq_eq7 (T : TubalRing n) :
+    ∃ M : Matrix (Fin n) (Fin n) ℂ, IsUnit M ∧
+      ∀ a : Fin n → ℝ, toC (T.winv a) = M⁻¹ *ᵥ pinvVec (M *ᵥ toC a) := by
+  sorry
+
 /-- "As Example 4 shows, the last theorem does not hold if we restrict `M` to be real": for
 the tubal ring of complex numbers on `ℝ²`, no real `M` works. -/
 theorem theorem11_not_real :

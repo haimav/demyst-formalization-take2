@@ -63,6 +63,18 @@ theorem example67 :
     ¬ (frontal U 1)ᵀ * frontal U 1 = 1 := by
   sorry
 
+/-- **Example 67**, Step 3 side claims: "The matrix `Â₁` is symmetric with eigenvalues 6 and 2
+(eigenvectors `(1/√2)[1, 1]` and `(1/√2)[1, -1]`)", and "The matrix `Â₂ = 2I` has both singular
+values equal to 2, so its SVD is not unique. We are free to choose any orthogonal factors". -/
+theorem example67_step3 :
+    (tHat A 0)ᴴ = tHat A 0 ∧
+    tHat A 0 *ᵥ (fun i => ((Q i 0 : ℝ) : ℂ)) = (6 : ℂ) • (fun i => ((Q i 0 : ℝ) : ℂ)) ∧
+    tHat A 0 *ᵥ (fun i => ((Q i 1 : ℝ) : ℂ)) = (2 : ℂ) • (fun i => ((Q i 1 : ℝ) : ℂ)) ∧
+    tHat S 1 = !![2, 0; 0, 2] ∧
+    (∀ W ∈ unitaryGroup (Fin 2) ℂ, IsSVD (tHat A 1) W (tHat S 1) W) ∧
+    IsSVD (tHat A 1) 1 (tHat S 1) 1 ∧ (1 : Matrix (Fin 2) (Fin 2) ℂ) ≠ tHat U 1 := by
+  sorry
+
 /-- The rank-`(1, 1)` multirank truncation `ℬ = [𝒜]_r` of Example 68:
 `𝐁₁ = [[2, 2], [2, 2]]`, `𝐁₂ = [[1, 1], [1, 1]]`. -/
 def B : Matrix (Fin 2) (Fin 2) (KM hadamard2) := ofSlices !![2, 2; 2, 2] !![1, 1; 1, 1]

@@ -166,6 +166,17 @@ theorem lemma59 (V : Submodule ℝ (Fin n → ℝ)) (hV : T.IsTubalSubring V) (e
       · rw [T.mem_principal]; exact ⟨x, rfl⟩
       · rw [T.mem_principal]; exact ⟨x, rfl⟩
 
+/-- Text after Lemma 59 / Section 9.4: "if we can find a non-trivial idempotent `p ∈ V`, then
+both principal ideals `(p)` and `(e_V - p)` are proper subsets of `V`, and so have lower
+dimension." -/
+theorem finrank_principal_lt (V : Submodule ℝ (Fin n → ℝ)) (hV : T.IsTubalSubring V)
+    (eV : Fin n → ℝ) (heV : T.IsUnitOf V eV) (p : Fin n → ℝ) (hp : p ∈ V)
+    (hpi : T.IsIdempotent p) (hp0 : p ≠ 0) (hpe : p ≠ eV) :
+    T.principal p < V ∧ T.principal (eV - p) < V ∧
+    Module.finrank ℝ (T.principal p) < Module.finrank ℝ V ∧
+    Module.finrank ℝ (T.principal (eV - p)) < Module.finrank ℝ V := by
+  sorry
+
 /-- `(V, +, ·)` is a division ring: every non-zero element of `V` has a multiplicative inverse
 in `V` (with respect to the unit `e_V` of `V`). This is the definition recalled in Section 9.4:
 "a ring is called a division ring if every non-zero element has a multiplicative inverse". -/

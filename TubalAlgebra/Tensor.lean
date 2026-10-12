@@ -219,6 +219,36 @@ theorem tensor_comp (M : Matrix (Fin n) (Fin n) ℂ) [Fact (Admissible M)] {m p 
   funext X
   simp only [twist_squeeze, mulVec_mulVec]
 
+/-- "Composition of `⋆_M`-linear functions is `⋆_M`-linear" (for operators on oriented
+matrices). -/
+theorem isStarMLinear_comp [Fact (Admissible M)] {m p l : ℕ}
+    (T : (Fin p → KM M) → (Fin m → KM M)) (S : (Fin l → KM M) → (Fin p → KM M))
+    (hT : IsStarMLinear T) (hS : IsStarMLinear S) : IsStarMLinear (T ∘ S) := by
+  sorry
+
+/-- "Composition of `⋆_M`-linear functions is `⋆_M`-linear" (for functions between matrices
+`ℝ^{l×n} → ℝ^{p×n} → ℝ^{m×n}`). -/
+theorem isStarMLinearMat_comp (M : Matrix (Fin n) (Fin n) ℂ) [Fact (Admissible M)] {m p l : ℕ}
+    (S₁ : Matrix (Fin p) (Fin n) ℝ → Matrix (Fin m) (Fin n) ℝ)
+    (S₂ : Matrix (Fin l) (Fin n) ℝ → Matrix (Fin p) (Fin n) ℝ)
+    (h₁ : IsStarMLinearMat M S₁) (h₂ : IsStarMLinearMat M S₂) : IsStarMLinearMat M (S₁ ∘ S₂) := by
+  sorry
+
+/-- Section 5.1: with scalar multiplication by tubes (element-wise) and the `⋆_M`-Hermitian
+transpose, the tensors `𝕂_M^{m×m}` form a `*`-algebra over `𝕂_M`: the `*`-algebra axioms
+(the `⋆_M`-Hermitian transpose is an involutive, additive, anti-multiplicative map, compatible
+with tube scalars `(r 𝒜)ᴴ = r* 𝒜ᴴ`), and scalar multiplication is entry-wise. -/
+theorem tensor_starAlgebra [Fact (Admissible M)] (m : ℕ) :
+    (∀ A : Matrix (Fin m) (Fin m) (KM M), Aᴴᴴ = A) ∧
+    (∀ A B : Matrix (Fin m) (Fin m) (KM M), (A + B)ᴴ = Aᴴ + Bᴴ) ∧
+    (∀ A B : Matrix (Fin m) (Fin m) (KM M), (A * B)ᴴ = Bᴴ * Aᴴ) ∧
+    (1 : Matrix (Fin m) (Fin m) (KM M))ᴴ = 1 ∧
+    (∀ (r : KM M) (A : Matrix (Fin m) (Fin m) (KM M)), (r • A)ᴴ = star r • Aᴴ) ∧
+    (∀ (r : KM M) (A : Matrix (Fin m) (Fin m) (KM M)) i j, (r • A) i j = r * A i j) ∧
+    (∀ (r : KM M) (A B : Matrix (Fin m) (Fin m) (KM M)), r • (A * B) = (r • A) * B ∧
+      r • (A * B) = A * (r • B)) := by
+  sorry
+
 /-- "For every compatibly sized `𝒜` and `ℬ` we have `(𝒜 ⋆_M ℬ)ᴴ = ℬᴴ ⋆_M 𝒜ᴴ`." -/
 theorem conjTranspose_tensor_mul [Fact (Admissible M)] {m p l : ℕ}
     (A : Matrix (Fin m) (Fin p) (KM M)) (B : Matrix (Fin p) (Fin l) (KM M)) :

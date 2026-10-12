@@ -57,8 +57,8 @@ def truncT [Fact (Admissible M)] {m p : ℕ} (U : Matrix (Fin m) (Fin m) (KM M))
 and non-zero scalar `c`. Let `𝒜 ∈ 𝕂_M^{m×p}` be a tensor and let `𝒜 = 𝒰 ⋆_M 𝒮 ⋆_M 𝒱ᴴ` be
 its `⋆_M`-SVD. For any `k ≤ ⋆_M-rank(𝒜)`, the tensor
 `[𝒜]_k := 𝒰_{:,1:k,:} ⋆_M 𝒮_{1:k,1:k,:} ⋆_M 𝒱ᴴ_{:,1:k,:}` is the optimal `⋆_M`-rank-`k`
-approximation of `𝒜` in the Frobenius norm: for any tensor `ℬ` of the same size as `𝒜` with
-`⋆_M-rank(ℬ) ≤ k`, `‖𝒜 - [𝒜]_k‖_F² ≤ ‖𝒜 - ℬ‖_F²`. Moreover,
+approximation of `𝒜` in the Frobenius norm: `[𝒜]_k` has `⋆_M`-rank at most `k`, and for any
+tensor `ℬ` of the same size as `𝒜` with `⋆_M-rank(ℬ) ≤ k`, `‖𝒜 - [𝒜]_k‖_F² ≤ ‖𝒜 - ℬ‖_F²`. Moreover,
 `‖𝒜 - [𝒜]_k‖_F² = ∑_{i=k+1}^{⋆_M-rank(𝒜)} ‖σᵢ‖_F²`.
 
 (The paper's subscripts `1:r` are a typo for `1:k`, and `𝒱ᴴ_{:,1:k,:}` denotes
@@ -70,6 +70,7 @@ theorem theorem35 [Fact (Admissible M)] (W : Matrix (Fin n) (Fin n) ℂ)
     (h : IsTSVD A U S V) (k : ℕ) (hk : k ≤ starMRank A) :
     let Ak := truncT U S V k (hk.trans ((starMRank_le_min A).trans (min_le_left m p)))
       (hk.trans ((starMRank_le_min A).trans (min_le_right m p)))
+    starMRank Ak ≤ k ∧
     (∀ B : Matrix (Fin m) (Fin p) (KM M), starMRank B ≤ k →
       tnorm (A - Ak) ^ 2 ≤ tnorm (A - B) ^ 2) ∧
     tnorm (A - Ak) ^ 2 = ∑ i : Fin (min m p),
@@ -119,7 +120,8 @@ is, for any tensor `ℬ` of the same size as `𝒜` and `⋆_M`-multirank at mos
 `‖𝒜 - [𝒜]_r‖_F² = |c|⁻² · ∑_{j=1}^n ∑_{i=r_j+1}^{rank(𝒜̂_j)} σ̂²_{ij}`.
 
 Here `[𝒜]_r := tInv (truncSlices …)`; the first conjunct states that this real tensor indeed
-has the prescribed transformed frontal slices.
+has the prescribed transformed frontal slices, and the second that it has `⋆_M`-multirank at
+most `r`.
 
 (The paper's factor `|c|⁻¹` is a typo for `|c|⁻²`, as confirmed by its Example 68;
 see `example68_literal_false` in `TubalAlgebra.Examples.AppendixA`. Also "multirank-k" is a
@@ -132,6 +134,7 @@ theorem theorem37 [Fact (Admissible M)] (W : Matrix (Fin n) (Fin n) ℂ)
     (hpat : RespectsConjPattern M r) :
     let Ar : Matrix (Fin m) (Fin p) (KM M) := tInv (truncSlices A U S V r hr)
     tHat Ar = truncSlices A U S V r hr ∧
+    multirank Ar ≤ r ∧
     (∀ B : Matrix (Fin m) (Fin p) (KM M), multirank B ≤ r →
       tnorm (A - Ar) ^ 2 ≤ tnorm (A - B) ^ 2) ∧
     tnorm (A - Ar) ^ 2 = (‖c‖ ^ 2)⁻¹ * ∑ j, ∑ i : Fin (min m p),

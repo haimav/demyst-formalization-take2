@@ -175,6 +175,12 @@ theorem example15_no_M :
       ∀ x y : Fin 2 → ℝ, toC (dualMul x y) = starMC M (toC x) (toC y) := by
   sorry
 
+/-- **Example 15** (in the sense of ring isomorphism): the ring of dual numbers is not
+isomorphic (as a ring) to any `𝕂_M`. -/
+theorem example15_not_iso (M : Matrix (Fin 2) (Fin 2) ℂ) [Fact (Admissible M)] :
+    IsEmpty (DualNumber ℝ ≃+* KM M) := by
+  sorry
+
 /-! ### Example 16 (t-product via circulant matrices) -/
 
 /-- The circulant matrix whose first column is `x`: `circ(x)_{ij} = x_{(i - j) mod n}`. -/
@@ -215,6 +221,22 @@ theorem example17 (Q : ℝ[X]) (hQ : Q.natDegree = n) (r : Fin n → ℂ) (hr : 
     (hroot : ∀ j, (Q.map (algebraMap ℝ ℂ)).IsRoot (r j)) (a b c : Fin n → ℝ) :
     Q ∣ polyOf c - polyOf a * polyOf b ↔
       vandermonde r *ᵥ toC c = (vandermonde r *ᵥ toC a) * (vandermonde r *ᵥ toC b) := by
+  sorry
+
+/-- The product of Section 3.2 / Example 17: `a · b` is the tube associated with the remainder
+`P_a · P_b mod Q` (whose degree is `< n` when `Q` has degree `n`). -/
+def polyModMul (Q : ℝ[X]) (a b : Fin n → ℝ) : Fin n → ℝ :=
+  fun k => ((polyOf a * polyOf b) % Q).coeff (k : ℕ)
+
+/-- Section 3.2 / **Example 17**: "we can choose some other polynomial `Q`, as long as its degree
+is `n` (for a ring over `ℝⁿ`) and all its roots are distinct … polynomial product modulo `Q` is
+essentially `⋆_M` with this `M`": the Vandermonde matrix at the roots is admissible, the mod-`Q`
+product is `⋆_M`, and it makes `ℝⁿ` a tubal ring. -/
+theorem example17_tubal (Q : ℝ[X]) (hQ : Q.natDegree = n) (r : Fin n → ℂ)
+    (hr : Function.Injective r) (hroot : ∀ j, (Q.map (algebraMap ℝ ℂ)).IsRoot (r j)) :
+    Admissible (vandermonde r) ∧
+    (∀ a b : Fin n → ℝ, toC (polyModMul Q a b) = starMC (vandermonde r) (toC a) (toC b)) ∧
+    ∃ T : TubalRing n, T.mul = polyModMul Q := by
   sorry
 
 /-- **Eq. (3)**: `P_c = P_a · P_b mod (Xⁿ - 1) ⟺ F_n c = F_n a • F_n b`
