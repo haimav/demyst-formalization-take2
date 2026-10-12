@@ -19,6 +19,7 @@ import TubalAlgebra.Section9.Ideals
 import TubalAlgebra.Section9.SubField
 import TubalAlgebra.Section9.Main
 import TubalAlgebra.Examples.Section3
+import TubalAlgebra.Examples.Section3b
 import TubalAlgebra.Examples.AppendixA
 import TubalAlgebra.Examples.AppendixB
 import TubalAlgebra.Count
