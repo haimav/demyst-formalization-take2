@@ -31,7 +31,8 @@ def tHat {m p : ℕ} (A : Matrix (Fin m) (Fin p) (KM M)) : Fin n → Matrix (Fin
 theorem tHat_eq_mode3 {m p : ℕ} (A : Matrix (Fin m) (Fin p) (KM M)) (i : Fin m) (k : Fin p)
     (j : Fin n) :
     tHat A j i k = mode3 (fun i k l => ((toTensor A i k l : ℝ) : ℂ)) M i k j := by
-  sorry
+  simp only [tHat, KM.hat, mode3, toTensor, mulVec, dotProduct, toC_apply]
+  exact Finset.sum_congr rfl fun l _ => mul_comm _ _
 
 /-- The facewise product `𝒳 Δ 𝒴`: its `j`-th frontal slice is `𝒳_j 𝒴_j`. -/
 def facewise {m p l : ℕ} (X : Fin n → Matrix (Fin m) (Fin p) ℂ)
@@ -43,24 +44,38 @@ def facewiseReal {m p l : ℕ} (A : Fin m → Fin p → Fin n → ℝ) (B : Fin 
     Fin m → Fin l → Fin n → ℝ :=
   fun i k j => ∑ q, A i q j * B q k j
 
+/-- The transform is injective on tensors. -/
+theorem tHat_injective [Fact (Admissible M)] {m p : ℕ} :
+    Function.Injective (tHat : Matrix (Fin m) (Fin p) (KM M) → Fin n → Matrix (Fin m) (Fin p) ℂ) := by
+  intro A B h
+  funext i k
+  apply KM.hat_injective
+  funext j
+  exact congrFun (congrFun (congrFun h j) i) k
+
 /-- **Fact 25.** For tensors `𝒜, ℬ, 𝒞` of compatible sizes: `𝒞 = 𝒜 ⋆_M ℬ ⟺ 𝒞̂ = 𝒜̂ Δ ℬ̂`. -/
 theorem fact25 [Fact (Admissible M)] {m p l : ℕ} (A : Matrix (Fin m) (Fin p) (KM M))
     (B : Matrix (Fin p) (Fin l) (KM M)) (C : Matrix (Fin m) (Fin l) (KM M)) :
     C = A * B ↔ tHat C = facewise (tHat A) (tHat B) := by
-  sorry
-
-/-- The transform is injective on tensors. -/
-theorem tHat_injective [Fact (Admissible M)] {m p : ℕ} :
-    Function.Injective (tHat : Matrix (Fin m) (Fin p) (KM M) → Fin n → Matrix (Fin m) (Fin p) ℂ) := by
-  sorry
+  have hmul : tHat (A * B) = facewise (tHat A) (tHat B) := by
+    funext j i k
+    simp only [tHat, facewise, Matrix.mul_apply, KM.hat_sum, Finset.sum_apply, KM.hat_mul,
+      Pi.mul_apply]
+  constructor
+  · rintro rfl
+    exact hmul
+  · intro h
+    exact tHat_injective (h.trans hmul.symm)
 
 @[simp] theorem tHat_add {m p : ℕ} (A B : Matrix (Fin m) (Fin p) (KM M)) :
     tHat (A + B) = tHat A + tHat B := by
-  sorry
+  funext j i k
+  simp [tHat]
 
 @[simp] theorem tHat_sub {m p : ℕ} (A B : Matrix (Fin m) (Fin p) (KM M)) :
     tHat (A - B) = tHat A - tHat B := by
-  sorry
+  funext j i k
+  simp [tHat]
 
 theorem tHat_mul [Fact (Admissible M)] {m p l : ℕ} (A : Matrix (Fin m) (Fin p) (KM M))
     (B : Matrix (Fin p) (Fin l) (KM M)) : tHat (A * B) = facewise (tHat A) (tHat B) :=
@@ -78,14 +93,23 @@ theorem example26 [Fact (Admissible M)] (m : ℕ) :
     (∀ {p : ℕ} (B : Matrix (Fin p) (Fin m) (KM M)), B * identityTensor m = B) ∧
     (∀ j, tHat (identityTensor m : Matrix (Fin m) (Fin m) (KM M)) j = 1) ∧
     (1 : KM M).hat = fun _ => 1 := by
-  sorry
+  have hI : (identityTensor m : Matrix (Fin m) (Fin m) (KM M)) = 1 := diagonal_one
+  refine ⟨fun A => by rw [hI]; exact Matrix.one_mul A, fun B => by rw [hI]; exact Matrix.mul_one B,
+    fun j => ?_,
+    KM.hat_one⟩
+  rw [hI]
+  funext i k
+  by_cases hik : i = k
+  · subst hik; simp [tHat]
+  · simp [tHat, hik]
 
 /-- **Example 27** (Hermitian transpose in the transform domain). For a tensor `𝒳`,
 `(𝒳ᴴ)^ = 𝒳̂^{HΔ}`, the tensor obtained by the Hermitian conjugate of the frontal slices of
 `𝒳̂`. -/
 theorem example27 [Fact (Admissible M)] {m p : ℕ} (X : Matrix (Fin m) (Fin p) (KM M)) :
     tHat Xᴴ = fun j => (tHat X j)ᴴ := by
-  sorry
+  funext j i k
+  simp [tHat, conjTranspose_apply]
 
 /-! ### Inverse transform -/
 
@@ -102,14 +126,26 @@ def SlicesConjPattern (M : Matrix (Fin n) (Fin n) ℂ) {m p : ℕ}
 
 theorem tHat_conjPattern {m p : ℕ} (A : Matrix (Fin m) (Fin p) (KM M)) :
     SlicesConjPattern M (tHat A) := by
-  sorry
+  intro i k
+  exact KM.hat_conjPattern (A i k)
 
 theorem tHat_tInv [Fact (Admissible M)] {m p : ℕ} (X : Fin n → Matrix (Fin m) (Fin p) ℂ)
     (hX : SlicesConjPattern M X) : tHat (tInv X : Matrix (Fin m) (Fin p) (KM M)) = X := by
-  sorry
+  funext j i k
+  have hM := (Fact.out : Admissible M)
+  have hr := inv_mulVec_mem_range_of_conjPattern M hM.1 hM.2 (hX i k)
+  simp only [tHat, tInv, KM.hat, KM.vec_mk]
+  rw [toC_re_of_mem_range hr, mulVec_inv_mulVec' hM.1]
 
 theorem tInv_tHat [Fact (Admissible M)] {m p : ℕ} (A : Matrix (Fin m) (Fin p) (KM M)) :
     tInv (tHat A) = A := by
-  sorry
+  funext i k
+  have hM := (Fact.out : Admissible M)
+  apply KM.ext
+  funext l
+  simp only [tInv, tHat, KM.hat, KM.vec_mk]
+  rw [show (fun j => (M *ᵥ toC (A i k).vec) j) = M *ᵥ toC (A i k).vec from rfl,
+    inv_mulVec_mulVec' hM.1]
+  simp [toC]
 
 end Tubal

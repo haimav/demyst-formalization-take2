@@ -74,6 +74,16 @@ lemma _root_.Tubal.toC_re_of_mem_range {v : Fin n → ℂ} (hv : v ∈ Set.range
 @[simp] theorem hat_smul (r : ℝ) (a : KM M) : (r • a).hat = (r : ℂ) • a.hat := by
   simp [hat, mulVec_smul]
 
+/-- The transform as an additive map. -/
+def hatAddHom : KM M →+ (Fin n → ℂ) where
+  toFun := KM.hat
+  map_zero' := hat_zero
+  map_add' := hat_add
+
+@[simp] theorem hat_sum {ι : Type*} (s : Finset ι) (f : ι → KM M) :
+    (∑ i ∈ s, f i).hat = ∑ i ∈ s, (f i).hat :=
+  map_sum hatAddHom f s
+
 theorem hat_conjPattern (a : KM M) : ConjPattern M a.hat :=
   conjPattern_mulVec_toC M a.vec
 
