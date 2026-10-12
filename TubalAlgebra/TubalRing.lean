@@ -111,6 +111,13 @@ theorem mul_sub (a b c : Fin n → ℝ) : T.mul a (b - c) = T.mul a b - T.mul a 
 theorem sub_mul (a b c : Fin n → ℝ) : T.mul (a - b) c = T.mul a c - T.mul b c := by
   rw [sub_eq_add_neg, T.right_distrib, T.neg_mul, ← sub_eq_add_neg]
 
+instance instAssociativeMul : Std.Associative T.mul := ⟨T.mul_assoc⟩
+
+instance instCommutativeMul : Std.Commutative T.mul := ⟨T.mul_comm⟩
+
+theorem mul_left_comm (a b c : Fin n → ℝ) : T.mul a (T.mul b c) = T.mul b (T.mul a c) := by
+  rw [← T.mul_assoc, T.mul_comm a b, T.mul_assoc]
+
 /-- For each `a`, the map `x ↦ a · x` as an `ℝ`-linear map. -/
 def mulLeft (a : Fin n → ℝ) : (Fin n → ℝ) →ₗ[ℝ] (Fin n → ℝ) where
   toFun := T.mul a
