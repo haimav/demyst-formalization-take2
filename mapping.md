@@ -3,7 +3,7 @@
 Paper: H. Avron, U. Mor, *Demystifying Tubal Tensor Algebra* (arXiv:2506.03311v2).
 Lean project: `TubalAlgebra` (Lean 4 v4.34.1, Mathlib v4.34.1). All declarations live in the
 namespace `Tubal` (the Appendix A examples in `Tubal.AppendixA`, the tubal-ring lemmas of
-Section 9 in `Tubal.TubalRing`). Build with `lake build`.
+Section 9 in `Tubal.TubalRing` ([TubalAlgebra/TubalRing.lean:34](TubalAlgebra/TubalRing.lean#L34))). Build with `lake build`.
 
 **Status:** every numbered result is formalized and fully proved — there is no `sorry`, no
 `admit`, no `native_decide`, and **no axiom beyond Lean's standard `propext`,
@@ -16,165 +16,168 @@ Every numbered result of the paper is listed below, in order, with the Lean decl
 formalize it. **Deviations** from the literal text (typos in the paper, implicit assumptions)
 are marked with ⚠ and explained; the section *Deviations* at the end collects them.
 
-The last column of each table, *Human Verified?*, is left blank for manual review.
+Each Lean name is followed by its location as a clickable `path:line` link (relative to the
+repository root); after editing the sources, regenerate these links with
+`python3 scripts/update_mapping_locations.py`. The last column of each table, *Human Verified?*,
+is left blank for manual review.
 
 ## Conventions used throughout
 
-| Paper | Lean | Human Verified? |
+| Paper | Lean declaration (file:line) | Human Verified? |
 |---|---|---|
 | vectors `ℝⁿ`, `ℂⁿ`; entries `1..n` | `Fin n → ℝ`, `Fin n → ℂ`; indices `0..n-1` |  |
-| embedding `ℝⁿ ⊂ ℂⁿ` | `toC` |  |
+| embedding `ℝⁿ ⊂ ℂⁿ` | `toC` ([TubalAlgebra/Defs.lean:34](TubalAlgebra/Defs.lean#L34)) |  |
 | Hadamard product `x • y` | pointwise product `x * y` of functions |  |
-| Eq. (5) `a ⋆_M b = M⁻¹(Ma • Mb)` | `starMC M a b` (`Defs.lean`) |  |
-| "every row of `M` is real or the conjugate of exactly one other row" | `ConjRowCondition M` (`RowReal`, `RowConjOf`) |  |
-| standing hypothesis "`M` invertible + row condition" | `Admissible M`, used as `[Fact (Admissible M)]` |  |
-| the ring `𝕂_M` (tubes `ℝⁿ` with `+`, `⋆_M`) | the type `KM M` with `KM.instCommRing`, `KM.instAlgebra`, `KM.instStarRing` |  |
-| transform `â = M a` | `KM.hat` |  |
-| `a ≤_M b` (`M(b-a)` real and `≥ 0`) | `≤` on `KM M` (`KM.le_def`) |  |
+| Eq. (5) `a ⋆_M b = M⁻¹(Ma • Mb)` | `starMC M a b` ([TubalAlgebra/Defs.lean:46](TubalAlgebra/Defs.lean#L46)) |  |
+| "every row of `M` is real or the conjugate of exactly one other row" | `ConjRowCondition M` ([TubalAlgebra/Defs.lean:59](TubalAlgebra/Defs.lean#L59)) (`RowReal` ([TubalAlgebra/Defs.lean:50](TubalAlgebra/Defs.lean#L50)), `RowConjOf` ([TubalAlgebra/Defs.lean:54](TubalAlgebra/Defs.lean#L54))) |  |
+| standing hypothesis "`M` invertible + row condition" | `Admissible M` ([TubalAlgebra/Defs.lean:64](TubalAlgebra/Defs.lean#L64)), used as `[Fact (Admissible M)]` |  |
+| the ring `𝕂_M` (tubes `ℝⁿ` with `+`, `⋆_M`) | the type `KM M` ([TubalAlgebra/Defs.lean:82](TubalAlgebra/Defs.lean#L82)) with `KM.instCommRing` ([TubalAlgebra/KMRing.lean:160](TubalAlgebra/KMRing.lean#L160)), `KM.instAlgebra` ([TubalAlgebra/KMRing.lean:173](TubalAlgebra/KMRing.lean#L173)), `KM.instStarRing` ([TubalAlgebra/KMRing.lean:188](TubalAlgebra/KMRing.lean#L188)) |  |
+| transform `â = M a` | `KM.hat` ([TubalAlgebra/Defs.lean:142](TubalAlgebra/Defs.lean#L142)) |  |
+| `a ≤_M b` (`M(b-a)` real and `≥ 0`) | `≤` on `KM M` ([TubalAlgebra/Defs.lean:82](TubalAlgebra/Defs.lean#L82)) (`KM.le_def` ([TubalAlgebra/Defs.lean:174](TubalAlgebra/Defs.lean#L174))) |  |
 | `𝕂_M^m` (oriented matrices) | `Fin m → KM M` |  |
-| tensors `𝕂_M^{m×p}` ≅ `ℝ^{m×p×n}` | `Matrix (Fin m) (Fin p) (KM M)` (`toTensor`/`ofTensor`) |  |
-| `𝒜 ⋆_M ℬ`, `𝒜 ⋆_M X` | Mathlib `Matrix` product `A * B`, `A *ᵥ X` over `KM M` |  |
+| tensors `𝕂_M^{m×p}` ≅ `ℝ^{m×p×n}` | `Matrix (Fin m) (Fin p) (KM M)` (`toTensor` ([TubalAlgebra/Tensor.lean:25](TubalAlgebra/Tensor.lean#L25))/`ofTensor` ([TubalAlgebra/Tensor.lean:29](TubalAlgebra/Tensor.lean#L29))) |  |
+| `𝒜 ⋆_M ℬ`, `𝒜 ⋆_M X` | Mathlib `Matrix` product `A * B`, `A *ᵥ X` over `KM M` ([TubalAlgebra/Defs.lean:82](TubalAlgebra/Defs.lean#L82)) |  |
 | `𝒜ᴴ` | `Aᴴ` (`Matrix.conjTranspose` w.r.t. the `⋆_M`-conjugate) |  |
-| `𝒜̂ = 𝒜 ×₃ M`, frontal slice `𝒜̂_j` | `tHat A j` (`= mode3 …`, `tHat_eq_mode3`) |  |
+| `𝒜̂ = 𝒜 ×₃ M`, frontal slice `𝒜̂_j` | `tHat A j` ([TubalAlgebra/Transform.lean:27](TubalAlgebra/Transform.lean#L27)) (`= mode3 …`, `tHat_eq_mode3` ([TubalAlgebra/Transform.lean:31](TubalAlgebra/Transform.lean#L31))) |  |
 | a tubal ring `(ℝⁿ, +, ·)` | `T : TubalRing n` with product `T.mul` |  |
 
-`KM M` carries the multiplication/unit/conjugate defined as the real parts of Eq. (5), `M⁻¹e`
-and Eq. (6); `KM.toC_vec_mul`, `KM.toC_vec_one`, `KM.toC_vec_star`, `KM.toC_vec_weakInv` show
+`KM M` ([TubalAlgebra/Defs.lean:82](TubalAlgebra/Defs.lean#L82)) carries the multiplication/unit/conjugate defined as the real parts of Eq. (5), `M⁻¹e`
+and Eq. (6); `KM.toC_vec_mul` ([TubalAlgebra/KMRing.lean:106](TubalAlgebra/KMRing.lean#L106)), `KM.toC_vec_one` ([TubalAlgebra/KMRing.lean:109](TubalAlgebra/KMRing.lean#L109)), `KM.toC_vec_star` ([TubalAlgebra/KMRing.lean:114](TubalAlgebra/KMRing.lean#L114)), `KM.toC_vec_weakInv` ([TubalAlgebra/KMRing.lean:119](TubalAlgebra/KMRing.lean#L119)) show
 that, under admissibility, these complex vectors *are* real, i.e. the operations are exactly
 those of the paper.
 
 ## Section 3: Algebra of tubes
 
-| Paper | Lean (file) | Human Verified? |
+| Paper | Lean declaration (file:line) | Human Verified? |
 |---|---|---|
-| **Theorem 1** (Frobenius) | `theorem1_frobenius` (`Frobenius.lean`) — fully proved (no axiom); commutative case `finrank_field_over_real` |  |
-| Eq. (3) (`P_c = P_a P_b mod (Xⁿ-1) ⟺ F_n c = F_n a • F_n b`) ⚠ | `eq3` (`Examples/Section3b.lean`) |  |
-| Eq. (5) | `starMC` (`Defs.lean`) |  |
-| **Lemma 2** | `lemma2` (`Realness.lean`; identical to Lemma 65) |  |
-| **Theorem 3** | `theorem3` (existence of a `CommRing` structure on `Fin n → ℝ` whose `+` is vector addition and whose product is `⋆_M`), `theorem3_KM`, instance `KM.instCommRing` (`KMRing.lean`) |  |
-| **Example 4** | `example4`, `M4`, `M4_admissible`, `example4_isField`, `complexTubal`, `example4_no_real_M` (`Examples/Section3.lean`); "the last theorem does not hold if we restrict `M` to be real": `theorem11_not_real` (`Section9/Main.lean`) |  |
-| **Proposition 5** ⚠ | `prop5` (`NotField.lean`); `dim_ℝ 𝕂_M = n`: `KM.finrank_eq` |  |
-| partial order `≤_M` ("easy to verify") | `KM.le_def`, `le_isPartialOrder` (`KMRing.lean`) |  |
-| Eq. (6) (`a* = M⁻¹ conj(Ma)`) | `Star (KM M)`, `KM.toC_vec_star`, `KM.hat_star` |  |
-| **Proposition 6** | `prop6`, instance `KM.instStarRing` (`KMRing.lean`) |  |
-| `x⁺`, Eq. (7) (`a⁻ = M⁻¹(Ma)⁺`) | `pinvVec`, `KM.weakInv`, `KM.toC_vec_weakInv` |  |
-| **Lemma 7** | `lemma7` (`Realness.lean`) |  |
-| **Lemma 8** | `lemma8` (`KMRing.lean`); "the first property makes the ring von Neumann regular": `KM.isVonNeumannRegularRing`; "if `a` is invertible, `a⁻` is its inverse": `KM.weakInv_eq_inverse` |  |
-| **Definition 9** | `IsVonNeumannRegularRing` (`Defs.lean`); the remark after it (uniqueness of `x` with `a = axa`, `x = xax` in a commutative VN-regular ring): `vonNeumann_unique` (`TubalRing.lean`) |  |
-| **Definition 10** | `TubalRing` (`TubalRing.lean`) |  |
-| **Theorem 11** (Main Result) | `theorem11` (`Section9/Main.lean`); also `theorem11_admissible` (the `M` satisfies the row condition), converse `exists_tubalRing_of_starM`, `KM.toTubalRing` (`TubalRing.lean`) |  |
-| **Definition 12** | `realness`, `IsRealLike` (`Defs.lean`) |  |
-| **Proposition 13** | `prop13` (`Canonical.lean`) |  |
-| remarks after Prop. 13 | `realness_le_and_parity` (`r ≡ n mod 2`), `star_eq_self_of_realLike` (`a* = a` for real-like rings) (`Canonical.lean`); "there are, up to isomorphism, `⌊n/2⌋+1` tubal rings": `tubalRing_count` (`Count.lean`, including non-isomorphism of different realness, which the paper does not prove) |  |
-| **Example 14** | `example14_classification` (every commutative ring over `ℝ²` is ≅ ℂ, split-complex or dual numbers), `splitCommAlg`, `example14_weakInv`, `splitTubal`, `example14` (`⋆_M` with `M = [[1,1],[1,-1]]`), `example14_dft` (= DFT for `n = 2`) |  |
-| **Example 15** | `dualCommAlg`, `example15_eps`, `example15_not_tubal`, `example15_no_M`, `example15_not_iso` (ring-isomorphism reading) |  |
-| **Example 16** | `circ`, `tProd`, `dftMatrix`, `dftMatrix_admissible`, `example16_circ_algebra`, `example16` |  |
-| **Example 17** | `polyOf`, `example17` (`P_c ≡ P_a P_b mod Q ⟺ Mc = Ma • Mb`, `M` = Vandermonde at the roots), `polyModMul`, `example17_tubal` (the mod-`Q` product is a tubal ring, Section 3.2), `skewFourier`, `example17_skewFourier`, `example17_two`, `example17_field`, `example17_complex_quotient` (`Examples/Section3b.lean`) |  |
-| **Example 18** ⚠ | `groupConv`, `example18`, `example18_tProduct`, `xorConv`, `walshHadamard`, `example18_xor`; typo evidence: `xorConvLiteral`, `example18_literal_not_comm` (`Examples/Section3b.lean`) |  |
+| **Theorem 1** (Frobenius) | `theorem1_frobenius` ([TubalAlgebra/Frobenius.lean:186](TubalAlgebra/Frobenius.lean#L186)) — fully proved (no axiom); commutative case `finrank_field_over_real` ([TubalAlgebra/Frobenius.lean:226](TubalAlgebra/Frobenius.lean#L226)) |  |
+| Eq. (3) (`P_c = P_a P_b mod (Xⁿ-1) ⟺ F_n c = F_n a • F_n b`) ⚠ | `eq3` ([TubalAlgebra/Examples/Section3b.lean:165](TubalAlgebra/Examples/Section3b.lean#L165)) |  |
+| Eq. (5) | `starMC` ([TubalAlgebra/Defs.lean:46](TubalAlgebra/Defs.lean#L46)) |  |
+| **Lemma 2** | `lemma2` ([TubalAlgebra/Realness.lean:409](TubalAlgebra/Realness.lean#L409)) (identical to Lemma 65) |  |
+| **Theorem 3** | `theorem3` ([TubalAlgebra/KMRing.lean:203](TubalAlgebra/KMRing.lean#L203)) (existence of a `CommRing` structure on `Fin n → ℝ` whose `+` is vector addition and whose product is `⋆_M`), `theorem3_KM` ([TubalAlgebra/KMRing.lean:213](TubalAlgebra/KMRing.lean#L213)), instance `KM.instCommRing` ([TubalAlgebra/KMRing.lean:160](TubalAlgebra/KMRing.lean#L160)) |  |
+| **Example 4** | `example4` ([TubalAlgebra/Examples/Section3.lean:59](TubalAlgebra/Examples/Section3.lean#L59)), `M4` ([TubalAlgebra/Examples/Section3.lean:48](TubalAlgebra/Examples/Section3.lean#L48)), `M4_admissible` ([TubalAlgebra/Examples/Section3.lean:65](TubalAlgebra/Examples/Section3.lean#L65)), `example4_isField` ([TubalAlgebra/Examples/Section3.lean:87](TubalAlgebra/Examples/Section3.lean#L87)), `complexTubal` ([TubalAlgebra/Examples/Section3.lean:173](TubalAlgebra/Examples/Section3.lean#L173)), `example4_no_real_M` ([TubalAlgebra/Examples/Section3.lean:146](TubalAlgebra/Examples/Section3.lean#L146)); "the last theorem does not hold if we restrict `M` to be real": `theorem11_not_real` ([TubalAlgebra/Section9/Main.lean:90](TubalAlgebra/Section9/Main.lean#L90)) |  |
+| **Proposition 5** ⚠ | `prop5` ([TubalAlgebra/NotField.lean:21](TubalAlgebra/NotField.lean#L21)); `dim_ℝ 𝕂_M = n`: `KM.finrank_eq` ([TubalAlgebra/KMRing.lean:337](TubalAlgebra/KMRing.lean#L337)) |  |
+| partial order `≤_M` ("easy to verify") | `KM.le_def` ([TubalAlgebra/Defs.lean:174](TubalAlgebra/Defs.lean#L174)), `le_isPartialOrder` ([TubalAlgebra/KMRing.lean:235](TubalAlgebra/KMRing.lean#L235)) |  |
+| Eq. (6) (`a* = M⁻¹ conj(Ma)`) | `Star (KM M)`, `KM.toC_vec_star` ([TubalAlgebra/KMRing.lean:114](TubalAlgebra/KMRing.lean#L114)), `KM.hat_star` ([TubalAlgebra/KMRing.lean:130](TubalAlgebra/KMRing.lean#L130)) |  |
+| **Proposition 6** | `prop6` ([TubalAlgebra/KMRing.lean:223](TubalAlgebra/KMRing.lean#L223)), instance `KM.instStarRing` ([TubalAlgebra/KMRing.lean:188](TubalAlgebra/KMRing.lean#L188)) |  |
+| `x⁺`, Eq. (7) (`a⁻ = M⁻¹(Ma)⁺`) | `pinvVec` ([TubalAlgebra/Defs.lean:74](TubalAlgebra/Defs.lean#L74)), `KM.weakInv` ([TubalAlgebra/Defs.lean:167](TubalAlgebra/Defs.lean#L167)), `KM.toC_vec_weakInv` ([TubalAlgebra/KMRing.lean:119](TubalAlgebra/KMRing.lean#L119)) |  |
+| **Lemma 7** | `lemma7` ([TubalAlgebra/Realness.lean:416](TubalAlgebra/Realness.lean#L416)) |  |
+| **Lemma 8** | `lemma8` ([TubalAlgebra/KMRing.lean:264](TubalAlgebra/KMRing.lean#L264)); "the first property makes the ring von Neumann regular": `KM.isVonNeumannRegularRing` ([TubalAlgebra/KMRing.lean:320](TubalAlgebra/KMRing.lean#L320)); "if `a` is invertible, `a⁻` is its inverse": `KM.weakInv_eq_inverse` ([TubalAlgebra/KMRing.lean:326](TubalAlgebra/KMRing.lean#L326)) |  |
+| **Definition 9** | `IsVonNeumannRegularRing` ([TubalAlgebra/Defs.lean:78](TubalAlgebra/Defs.lean#L78)); the remark after it (uniqueness of `x` with `a = axa`, `x = xax` in a commutative VN-regular ring): `vonNeumann_unique` ([TubalAlgebra/TubalRing.lean:56](TubalAlgebra/TubalRing.lean#L56)) |  |
+| **Definition 10** | `TubalRing` ([TubalAlgebra/TubalRing.lean:34](TubalAlgebra/TubalRing.lean#L34)) |  |
+| **Theorem 11** (Main Result) | `theorem11` ([TubalAlgebra/Section9/Main.lean:44](TubalAlgebra/Section9/Main.lean#L44)); also `theorem11_admissible` ([TubalAlgebra/Section9/Main.lean:51](TubalAlgebra/Section9/Main.lean#L51)) (the `M` satisfies the row condition), converse `exists_tubalRing_of_starM` ([TubalAlgebra/TubalRing.lean:294](TubalAlgebra/TubalRing.lean#L294)), `KM.toTubalRing` ([TubalAlgebra/TubalRing.lean:259](TubalAlgebra/TubalRing.lean#L259)) |  |
+| **Definition 12** | `realness` ([TubalAlgebra/Defs.lean:68](TubalAlgebra/Defs.lean#L68)), `IsRealLike` ([TubalAlgebra/Defs.lean:71](TubalAlgebra/Defs.lean#L71)) |  |
+| **Proposition 13** | `prop13` ([TubalAlgebra/Canonical.lean:368](TubalAlgebra/Canonical.lean#L368)) |  |
+| remarks after Prop. 13 | `realness_le_and_parity` ([TubalAlgebra/Canonical.lean:339](TubalAlgebra/Canonical.lean#L339)) (`r ≡ n mod 2`), `star_eq_self_of_realLike` ([TubalAlgebra/Canonical.lean:374](TubalAlgebra/Canonical.lean#L374)) (`a* = a` for real-like rings); "there are, up to isomorphism, `⌊n/2⌋+1` tubal rings": `tubalRing_count` ([TubalAlgebra/Count.lean:138](TubalAlgebra/Count.lean#L138)) (including non-isomorphism of different realness, which the paper does not prove) |  |
+| **Example 14** | `example14_classification` ([TubalAlgebra/Examples/Section3.lean:243](TubalAlgebra/Examples/Section3.lean#L243)) (every commutative ring over `ℝ²` is ≅ ℂ, split-complex or dual numbers), `splitCommAlg` ([TubalAlgebra/Examples/Section3.lean:329](TubalAlgebra/Examples/Section3.lean#L329)), `example14_weakInv` ([TubalAlgebra/Examples/Section3.lean:350](TubalAlgebra/Examples/Section3.lean#L350)), `splitTubal` ([TubalAlgebra/Examples/Section3.lean:367](TubalAlgebra/Examples/Section3.lean#L367)), `example14` ([TubalAlgebra/Examples/Section3.lean:409](TubalAlgebra/Examples/Section3.lean#L409)) (`⋆_M` with `M = [[1,1],[1,-1]]`), `example14_dft` ([TubalAlgebra/Examples/Section3.lean:420](TubalAlgebra/Examples/Section3.lean#L420)) (= DFT for `n = 2`) |  |
+| **Example 15** | `dualCommAlg` ([TubalAlgebra/Examples/Section3.lean:430](TubalAlgebra/Examples/Section3.lean#L430)), `example15_eps` ([TubalAlgebra/Examples/Section3.lean:449](TubalAlgebra/Examples/Section3.lean#L449)), `example15_not_tubal` ([TubalAlgebra/Examples/Section3.lean:453](TubalAlgebra/Examples/Section3.lean#L453)), `example15_no_M` ([TubalAlgebra/Examples/Section3.lean:462](TubalAlgebra/Examples/Section3.lean#L462)), `example15_not_iso` ([TubalAlgebra/Examples/Section3.lean:485](TubalAlgebra/Examples/Section3.lean#L485)) (ring-isomorphism reading) |  |
+| **Example 16** | `circ` ([TubalAlgebra/Examples/Section3.lean:506](TubalAlgebra/Examples/Section3.lean#L506)), `tProd` ([TubalAlgebra/Examples/Section3.lean:509](TubalAlgebra/Examples/Section3.lean#L509)), `dftMatrix` ([TubalAlgebra/Examples/Section3.lean:415](TubalAlgebra/Examples/Section3.lean#L415)), `dftMatrix_admissible` ([TubalAlgebra/Examples/Section3.lean:583](TubalAlgebra/Examples/Section3.lean#L583)), `example16_circ_algebra` ([TubalAlgebra/Examples/Section3.lean:669](TubalAlgebra/Examples/Section3.lean#L669)), `example16` ([TubalAlgebra/Examples/Section3.lean:680](TubalAlgebra/Examples/Section3.lean#L680)) |  |
+| **Example 17** | `polyOf` ([TubalAlgebra/Examples/Section3b.lean:18](TubalAlgebra/Examples/Section3b.lean#L18)), `example17` ([TubalAlgebra/Examples/Section3b.lean:68](TubalAlgebra/Examples/Section3b.lean#L68)) (`P_c ≡ P_a P_b mod Q ⟺ Mc = Ma • Mb`, `M` = Vandermonde at the roots), `polyModMul` ([TubalAlgebra/Examples/Section3b.lean:87](TubalAlgebra/Examples/Section3b.lean#L87)), `example17_tubal` ([TubalAlgebra/Examples/Section3b.lean:108](TubalAlgebra/Examples/Section3b.lean#L108)) (the mod-`Q` product is a tubal ring, Section 3.2), `skewFourier` ([TubalAlgebra/Examples/Section3b.lean:178](TubalAlgebra/Examples/Section3b.lean#L178)), `example17_skewFourier` ([TubalAlgebra/Examples/Section3b.lean:183](TubalAlgebra/Examples/Section3b.lean#L183)), `example17_two` ([TubalAlgebra/Examples/Section3b.lean:207](TubalAlgebra/Examples/Section3b.lean#L207)), `example17_field` ([TubalAlgebra/Examples/Section3b.lean:220](TubalAlgebra/Examples/Section3b.lean#L220)), `example17_complex_quotient` ([TubalAlgebra/Examples/Section3b.lean:256](TubalAlgebra/Examples/Section3b.lean#L256)) |  |
+| **Example 18** ⚠ | `groupConv` ([TubalAlgebra/Examples/Section3b.lean:275](TubalAlgebra/Examples/Section3b.lean#L275)), `example18` ([TubalAlgebra/Examples/Section3b.lean:302](TubalAlgebra/Examples/Section3b.lean#L302)), `example18_tProduct` ([TubalAlgebra/Examples/Section3b.lean:331](TubalAlgebra/Examples/Section3b.lean#L331)), `xorConv` ([TubalAlgebra/Examples/Section3b.lean:349](TubalAlgebra/Examples/Section3b.lean#L349)), `walshHadamard` ([TubalAlgebra/Examples/Section3b.lean:365](TubalAlgebra/Examples/Section3b.lean#L365)), `example18_xor` ([TubalAlgebra/Examples/Section3b.lean:446](TubalAlgebra/Examples/Section3b.lean#L446)); typo evidence: `xorConvLiteral` ([TubalAlgebra/Examples/Section3b.lean:353](TubalAlgebra/Examples/Section3b.lean#L353)), `example18_literal_not_comm` ([TubalAlgebra/Examples/Section3b.lean:356](TubalAlgebra/Examples/Section3b.lean#L356)) |  |
 
 ## Section 4: Module of oriented matrices
 
-| Paper | Lean (`Module.lean`) | Human Verified? |
+| Paper | Lean declaration (file:line) | Human Verified? |
 |---|---|---|
-| squeeze / twist (`𝕂_M^m ≅ ℝ^{m×n}`) | `squeeze`, `twist`, `orientedEquiv` |  |
-| **Theorem 19** ⚠ | `theorem19` (free; basis `E_i` = `stdOriented`; every basis has `m` elements and `finrank = m` when `n ≠ 0`) |  |
-| Eq. (8) | `dotM` |  |
-| **Theorem 20** | `theorem20`; key step `star_mul_self_nonneg` |  |
+| squeeze / twist (`𝕂_M^m ≅ ℝ^{m×n}`) | `squeeze` ([TubalAlgebra/Module.lean:20](TubalAlgebra/Module.lean#L20)), `twist` ([TubalAlgebra/Module.lean:23](TubalAlgebra/Module.lean#L23)), `orientedEquiv` ([TubalAlgebra/Module.lean:31](TubalAlgebra/Module.lean#L31)) |  |
+| **Theorem 19** ⚠ | `theorem19` ([TubalAlgebra/Module.lean:46](TubalAlgebra/Module.lean#L46)) (free; basis `E_i` = `stdOriented` ([TubalAlgebra/Module.lean:41](TubalAlgebra/Module.lean#L41)); every basis has `m` elements and `finrank = m` when `n ≠ 0`) |  |
+| Eq. (8) | `dotM` ([TubalAlgebra/Module.lean:67](TubalAlgebra/Module.lean#L67)) |  |
+| **Theorem 20** | `theorem20` ([TubalAlgebra/Module.lean:91](TubalAlgebra/Module.lean#L91)); key step `star_mul_self_nonneg` ([TubalAlgebra/Module.lean:71](TubalAlgebra/Module.lean#L71)) |  |
 
 ## Section 5: Tensors as matrices over `𝕂_M`
 
-| Paper | Lean (`Tensor.lean`) | Human Verified? |
+| Paper | Lean declaration (file:line) | Human Verified? |
 |---|---|---|
-| `(𝒜 ⋆_M ℬ)_{ij} = ∑ₖ 𝒜_{ik} ⋆_M ℬ_{kj}` | `tensor_mul_apply` |  |
-| **Definition 21** | `IsStarMLinear`, `IsStarMLinearMat` |  |
-| **Remark 22** | `remark22_smul_eq`, `remark22_linear`, `remark22_linear_mat`, `remark22_converse_false` (⚠ see deviations), `remark22_converse_false'` |  |
-| unnumbered claims after Remark 22 | `isStarMLinearMat_of_tensor`, `exists_tensor_of_isStarMLinearMat`, `tensor_comp`, `isStarMLinear_comp`, `isStarMLinearMat_comp` |  |
-| Section 5.1 (`*`-algebra; `(𝒜⋆ℬ)ᴴ = ℬᴴ⋆𝒜ᴴ`) | `tensor_starAlgebra`, `conjTranspose_tensor_mul`, `conjTranspose_tensor_apply` |  |
-| **Definition 23** ⚠ | `IsStarMAdjoint`, `isStarMAdjoint_unique`, `exists_isStarMAdjoint` |  |
-| **Proposition 24** | `prop24` |  |
+| `(𝒜 ⋆_M ℬ)_{ij} = ∑ₖ 𝒜_{ik} ⋆_M ℬ_{kj}` | `tensor_mul_apply` ([TubalAlgebra/Tensor.lean:34](TubalAlgebra/Tensor.lean#L34)) |  |
+| **Definition 21** | `IsStarMLinear` ([TubalAlgebra/Tensor.lean:40](TubalAlgebra/Tensor.lean#L40)), `IsStarMLinearMat` ([TubalAlgebra/Tensor.lean:46](TubalAlgebra/Tensor.lean#L46)) |  |
+| **Remark 22** | `remark22_smul_eq` ([TubalAlgebra/Tensor.lean:107](TubalAlgebra/Tensor.lean#L107)), `remark22_linear` ([TubalAlgebra/Tensor.lean:112](TubalAlgebra/Tensor.lean#L112)), `remark22_linear_mat` ([TubalAlgebra/Tensor.lean:121](TubalAlgebra/Tensor.lean#L121)), `remark22_converse_false` ([TubalAlgebra/Tensor.lean:181](TubalAlgebra/Tensor.lean#L181)) (⚠ see deviations), `remark22_converse_false'` ([TubalAlgebra/Tensor.lean:138](TubalAlgebra/Tensor.lean#L138)) |  |
+| unnumbered claims after Remark 22 | `isStarMLinearMat_of_tensor` ([TubalAlgebra/Tensor.lean:196](TubalAlgebra/Tensor.lean#L196)), `exists_tensor_of_isStarMLinearMat` ([TubalAlgebra/Tensor.lean:204](TubalAlgebra/Tensor.lean#L204)), `tensor_comp` ([TubalAlgebra/Tensor.lean:215](TubalAlgebra/Tensor.lean#L215)), `isStarMLinear_comp` ([TubalAlgebra/Tensor.lean:224](TubalAlgebra/Tensor.lean#L224)), `isStarMLinearMat_comp` ([TubalAlgebra/Tensor.lean:233](TubalAlgebra/Tensor.lean#L233)) |  |
+| Section 5.1 (`*`-algebra; `(𝒜⋆ℬ)ᴴ = ℬᴴ⋆𝒜ᴴ`) | `tensor_starAlgebra` ([TubalAlgebra/Tensor.lean:253](TubalAlgebra/Tensor.lean#L253)), `conjTranspose_tensor_mul` ([TubalAlgebra/Tensor.lean:270](TubalAlgebra/Tensor.lean#L270)), `conjTranspose_tensor_apply` ([TubalAlgebra/Tensor.lean:276](TubalAlgebra/Tensor.lean#L276)) |  |
+| **Definition 23** ⚠ | `IsStarMAdjoint` ([TubalAlgebra/Tensor.lean:284](TubalAlgebra/Tensor.lean#L284)), `isStarMAdjoint_unique` ([TubalAlgebra/Tensor.lean:289](TubalAlgebra/Tensor.lean#L289)), `exists_isStarMAdjoint` ([TubalAlgebra/Tensor.lean:313](TubalAlgebra/Tensor.lean#L313)) |  |
+| **Proposition 24** | `prop24` ([TubalAlgebra/Tensor.lean:300](TubalAlgebra/Tensor.lean#L300)) |  |
 
 ## Section 6: Practical tubal algebra
 
-| Paper | Lean (`Transform.lean`) | Human Verified? |
+| Paper | Lean declaration (file:line) | Human Verified? |
 |---|---|---|
-| facewise product, `𝒜̂ = 𝒜 ×₃ M` | `facewise`, `facewiseReal`, `mode3`, `tHat`, `tHat_eq_mode3` |  |
-| **Fact 25** | `fact25`, `tHat_mul`, `tHat_injective` |  |
-| **Example 26** | `identityTensor`, `example26` |  |
-| **Example 27** | `example27` |  |
-| inverse transform (used later) | `tInv`, `tHat_tInv`, `tInv_tHat`, `SlicesConjPattern` |  |
+| facewise product, `𝒜̂ = 𝒜 ×₃ M` | `facewise` ([TubalAlgebra/Transform.lean:38](TubalAlgebra/Transform.lean#L38)), `facewiseReal` ([TubalAlgebra/Transform.lean:43](TubalAlgebra/Transform.lean#L43)), `mode3` ([TubalAlgebra/Transform.lean:22](TubalAlgebra/Transform.lean#L22)), `tHat` ([TubalAlgebra/Transform.lean:27](TubalAlgebra/Transform.lean#L27)), `tHat_eq_mode3` ([TubalAlgebra/Transform.lean:31](TubalAlgebra/Transform.lean#L31)) |  |
+| **Fact 25** | `fact25` ([TubalAlgebra/Transform.lean:57](TubalAlgebra/Transform.lean#L57)), `tHat_mul` ([TubalAlgebra/Transform.lean:80](TubalAlgebra/Transform.lean#L80)), `tHat_injective` ([TubalAlgebra/Transform.lean:48](TubalAlgebra/Transform.lean#L48)) |  |
+| **Example 26** | `identityTensor` ([TubalAlgebra/Transform.lean:85](TubalAlgebra/Transform.lean#L85)), `example26` ([TubalAlgebra/Transform.lean:91](TubalAlgebra/Transform.lean#L91)) |  |
+| **Example 27** | `example27` ([TubalAlgebra/Transform.lean:109](TubalAlgebra/Transform.lean#L109)) |  |
+| inverse transform (used later) | `tInv` ([TubalAlgebra/Transform.lean:119](TubalAlgebra/Transform.lean#L119)), `tHat_tInv` ([TubalAlgebra/Transform.lean:132](TubalAlgebra/Transform.lean#L132)), `tInv_tHat` ([TubalAlgebra/Transform.lean:140](TubalAlgebra/Transform.lean#L140)), `SlicesConjPattern` ([TubalAlgebra/Transform.lean:123](TubalAlgebra/Transform.lean#L123)) |  |
 
 ## Section 7: Tubal SVD and Eckart–Young
 
-| Paper | Lean | Human Verified? |
+| Paper | Lean declaration (file:line) | Human Verified? |
 |---|---|---|
-| matrix SVD / Eckart–Young (classical background) | `IsSVD`, `exists_svd`, `eckart_young`, `IsSVD.frobSq_sub_truncProd`, … (`MatrixSVD.lean`) |  |
-| **Definition 28** | `IsStarMUnitary`; "unitary iff facewise unitary": `isStarMUnitary_iff_facewise` (`TSVD.lean`) |  |
-| **Definition 29** | `frontal`, `IsFDiagonal` (`TSVD.lean`) |  |
-| **Theorem 30** | `theorem30`, `IsTSVD`, `sigma` (`TSVD.lean`) |  |
-| **Definition 31** | `tsvdRank`, `starMRank` (`TSVD.lean`) |  |
-| **Lemma 32** | `lemma32`, `lemma32_any` (independence of the chosen ⋆_M-SVD) |  |
-| **Lemma 33** | `lemma33`, `tnorm`, `tubeNorm` (`EckartYoung.lean`) |  |
-| **Corollary 34** | `cor34` |  |
-| **Theorem 35** ⚠ | `theorem35`, `truncT` |  |
-| **Definition 36** | `multirank`, `RespectsConjPattern`, `multirank_respectsConjPattern` |  |
-| **Theorem 37** ⚠ | `theorem37`, `truncSlices`; typo evidence `example68_literal_false` |  |
+| matrix SVD / Eckart–Young (classical background) | `IsSVD` ([TubalAlgebra/MatrixSVD.lean:34](TubalAlgebra/MatrixSVD.lean#L34)), `exists_svd` ([TubalAlgebra/MatrixSVD.lean:90](TubalAlgebra/MatrixSVD.lean#L90)), `eckart_young` ([TubalAlgebra/MatrixSVD.lean:687](TubalAlgebra/MatrixSVD.lean#L687)), `IsSVD.frobSq_sub_truncProd` ([TubalAlgebra/MatrixSVD.lean:478](TubalAlgebra/MatrixSVD.lean#L478)), … |  |
+| **Definition 28** | `IsStarMUnitary` ([TubalAlgebra/TSVD.lean:18](TubalAlgebra/TSVD.lean#L18)); "unitary iff facewise unitary": `isStarMUnitary_iff_facewise` ([TubalAlgebra/TSVD.lean:35](TubalAlgebra/TSVD.lean#L35)) |  |
+| **Definition 29** | `frontal` ([TubalAlgebra/TSVD.lean:44](TubalAlgebra/TSVD.lean#L44)), `IsFDiagonal` ([TubalAlgebra/TSVD.lean:50](TubalAlgebra/TSVD.lean#L50)) |  |
+| **Theorem 30** | `theorem30` ([TubalAlgebra/TSVD.lean:172](TubalAlgebra/TSVD.lean#L172)), `IsTSVD` ([TubalAlgebra/TSVD.lean:60](TubalAlgebra/TSVD.lean#L60)), `sigma` ([TubalAlgebra/TSVD.lean:55](TubalAlgebra/TSVD.lean#L55)) |  |
+| **Definition 31** | `tsvdRank` ([TubalAlgebra/TSVD.lean:232](TubalAlgebra/TSVD.lean#L232)), `starMRank` ([TubalAlgebra/TSVD.lean:238](TubalAlgebra/TSVD.lean#L238)) |  |
+| **Lemma 32** | `lemma32` ([TubalAlgebra/TSVD.lean:324](TubalAlgebra/TSVD.lean#L324)), `lemma32_any` ([TubalAlgebra/TSVD.lean:330](TubalAlgebra/TSVD.lean#L330)) (independence of the chosen ⋆_M-SVD) |  |
+| **Lemma 33** | `lemma33` ([TubalAlgebra/EckartYoung.lean:195](TubalAlgebra/EckartYoung.lean#L195)), `tnorm` ([TubalAlgebra/EckartYoung.lean:17](TubalAlgebra/EckartYoung.lean#L17)), `tubeNorm` ([TubalAlgebra/EckartYoung.lean:21](TubalAlgebra/EckartYoung.lean#L21)) |  |
+| **Corollary 34** | `cor34` ([TubalAlgebra/EckartYoung.lean:213](TubalAlgebra/EckartYoung.lean#L213)) |  |
+| **Theorem 35** ⚠ | `theorem35` ([TubalAlgebra/EckartYoung.lean:308](TubalAlgebra/EckartYoung.lean#L308)), `truncT` ([TubalAlgebra/EckartYoung.lean:245](TubalAlgebra/EckartYoung.lean#L245)) |  |
+| **Definition 36** | `multirank` ([TubalAlgebra/EckartYoung.lean:354](TubalAlgebra/EckartYoung.lean#L354)), `RespectsConjPattern` ([TubalAlgebra/EckartYoung.lean:360](TubalAlgebra/EckartYoung.lean#L360)), `multirank_respectsConjPattern` ([TubalAlgebra/EckartYoung.lean:377](TubalAlgebra/EckartYoung.lean#L377)) |  |
+| **Theorem 37** ⚠ | `theorem37` ([TubalAlgebra/EckartYoung.lean:457](TubalAlgebra/EckartYoung.lean#L457)), `truncSlices` ([TubalAlgebra/EckartYoung.lean:392](TubalAlgebra/EckartYoung.lean#L392)); typo evidence `example68_literal_false` ([TubalAlgebra/Examples/AppendixA.lean:354](TubalAlgebra/Examples/AppendixA.lean#L354)) |  |
 
 ## Section 9: Proof of Theorem 11
 
-| Paper | Lean | Human Verified? |
+| Paper | Lean declaration (file:line) | Human Verified? |
 |---|---|---|
-| preamble (`a⁻` as the unique `x` with `a = axa`, `x = xax`; "the two definitions coincide") | `TubalRing.winv`, `winv_spec`, `winv_unique` (`TubalRing.lean`); `TubalRing.winv_eq_eq7`, `TubalRing.exists_winv_eq_eq7` (`Section9/Main.lean`) |  |
-| **Lemma 38** ⚠ | `lemma38` (`Section9/SimulDiag.lean`), with `IsDiagonalizableMat`, `IsJointlyDiagonalizableMat` |  |
-| **Definition 39** | `TubalRing.repMat`, `repMat_mulVec`, `repMat_unique`, `TubalRing.Rep` (`Section9/RepMatrix.lean`) |  |
-| **Example 40** | `example40` |  |
-| **Lemma 41** | `TubalRing.lemma41` |  |
-| **Lemma 42** | `TubalRing.lemma42` |  |
-| **Lemma 43** | `TubalRing.lemma43` |  |
-| **Corollary 44** | `TubalRing.cor44` |  |
-| **Definition 45** | `TubalRing.IsIdempotent` |  |
-| **Lemma 46** | `TubalRing.lemma46` |  |
-| `a · b` for `b ∈ ℂⁿ`; `a · b = R_a b` | `TubalRing.mulC`, `mulC_eq_repMat_mulVec` (`Section9/Diagonalizable.lean`) |  |
-| **Definition 47** | `TubalRing.IsEigenvector` |  |
-| **Definition 48** | `TubalRing.IsDiagonalizable` |  |
-| **Lemma 49** | `TubalRing.lemma49` |  |
-| **Definition 50** | `IsDiagonalizableSet`, `IsDiagonalizableRing`, `IsJointlyDiagonalizable`, `IsJointlyDiagonalizableRing` |  |
-| **Lemma 51** | `TubalRing.lemma51` |  |
-| **Lemma 52** | `TubalRing.lemma52` |  |
-| **Lemma 53** | `TubalRing.lemma53` |  |
-| **Proposition 54** | `TubalRing.prop54` |  |
-| **Definition 55** | `TubalRing.IsTubalSubring` (`Section9/Ideals.lean`) |  |
-| **Definition 56** | `TubalRing.principalSet`, `TubalRing.principal` |  |
-| **Lemma 57** | `TubalRing.lemma57` |  |
-| **Lemma 58** | `TubalRing.lemma58` |  |
-| **Lemma 59** | `TubalRing.lemma59`; text after it ("proper subsets, lower dimension"): `finrank_principal_lt` |  |
-| division ring / tubal sub-field (Sec. 9.4) | `TubalRing.IsDivisionSubring`, `TubalRing.IsTubalSubfield` |  |
-| **Lemma 60** | `TubalRing.lemma60` |  |
-| **Corollary 61** | `TubalRing.cor61` |  |
-| **Proposition 62** | `TubalRing.prop62` (`Section9/SubField.lean`) |  |
-| Section 9.6 (bringing it together) | `TubalRing.isDiagonalizableRing`, `theorem11` (`Section9/Main.lean`) |  |
+| preamble (`a⁻` as the unique `x` with `a = axa`, `x = xax`; "the two definitions coincide") | `TubalRing.winv` ([TubalAlgebra/TubalRing.lean:234](TubalAlgebra/TubalRing.lean#L234)), `winv_spec` ([TubalAlgebra/TubalRing.lean:240](TubalAlgebra/TubalRing.lean#L240)), `winv_unique` ([TubalAlgebra/TubalRing.lean:246](TubalAlgebra/TubalRing.lean#L246)); `TubalRing.winv_eq_eq7` ([TubalAlgebra/Section9/Main.lean:61](TubalAlgebra/Section9/Main.lean#L61)), `TubalRing.exists_winv_eq_eq7` ([TubalAlgebra/Section9/Main.lean:82](TubalAlgebra/Section9/Main.lean#L82)) |  |
+| **Lemma 38** ⚠ | `lemma38` ([TubalAlgebra/Section9/SimulDiag.lean:148](TubalAlgebra/Section9/SimulDiag.lean#L148)), with `IsDiagonalizableMat` ([TubalAlgebra/Section9/SimulDiag.lean:17](TubalAlgebra/Section9/SimulDiag.lean#L17)), `IsJointlyDiagonalizableMat` ([TubalAlgebra/Section9/SimulDiag.lean:22](TubalAlgebra/Section9/SimulDiag.lean#L22)) |  |
+| **Definition 39** | `TubalRing.repMat` ([TubalAlgebra/Section9/RepMatrix.lean:29](TubalAlgebra/Section9/RepMatrix.lean#L29)), `repMat_mulVec` ([TubalAlgebra/Section9/RepMatrix.lean:32](TubalAlgebra/Section9/RepMatrix.lean#L32)), `repMat_unique` ([TubalAlgebra/Section9/RepMatrix.lean:41](TubalAlgebra/Section9/RepMatrix.lean#L41)), `TubalRing.Rep` ([TubalAlgebra/Section9/RepMatrix.lean:49](TubalAlgebra/Section9/RepMatrix.lean#L49)) |  |
+| **Example 40** | `example40` ([TubalAlgebra/Section9/RepMatrix.lean:136](TubalAlgebra/Section9/RepMatrix.lean#L136)) |  |
+| **Lemma 41** | `TubalRing.lemma41` ([TubalAlgebra/Section9/RepMatrix.lean:52](TubalAlgebra/Section9/RepMatrix.lean#L52)) |  |
+| **Lemma 42** | `TubalRing.lemma42` ([TubalAlgebra/Section9/RepMatrix.lean:61](TubalAlgebra/Section9/RepMatrix.lean#L61)) |  |
+| **Lemma 43** | `TubalRing.lemma43` ([TubalAlgebra/Section9/RepMatrix.lean:72](TubalAlgebra/Section9/RepMatrix.lean#L72)) |  |
+| **Corollary 44** | `TubalRing.cor44` ([TubalAlgebra/Section9/RepMatrix.lean:92](TubalAlgebra/Section9/RepMatrix.lean#L92)) |  |
+| **Definition 45** | `TubalRing.IsIdempotent` ([TubalAlgebra/Section9/RepMatrix.lean:123](TubalAlgebra/Section9/RepMatrix.lean#L123)) |  |
+| **Lemma 46** | `TubalRing.lemma46` ([TubalAlgebra/Section9/RepMatrix.lean:126](TubalAlgebra/Section9/RepMatrix.lean#L126)) |  |
+| `a · b` for `b ∈ ℂⁿ`; `a · b = R_a b` | `TubalRing.mulC` ([TubalAlgebra/Section9/Diagonalizable.lean:34](TubalAlgebra/Section9/Diagonalizable.lean#L34)), `mulC_eq_repMat_mulVec` ([TubalAlgebra/Section9/Diagonalizable.lean:38](TubalAlgebra/Section9/Diagonalizable.lean#L38)) |  |
+| **Definition 47** | `TubalRing.IsEigenvector` ([TubalAlgebra/Section9/Diagonalizable.lean:53](TubalAlgebra/Section9/Diagonalizable.lean#L53)) |  |
+| **Definition 48** | `TubalRing.IsDiagonalizable` ([TubalAlgebra/Section9/Diagonalizable.lean:58](TubalAlgebra/Section9/Diagonalizable.lean#L58)) |  |
+| **Lemma 49** | `TubalRing.lemma49` ([TubalAlgebra/Section9/Diagonalizable.lean:63](TubalAlgebra/Section9/Diagonalizable.lean#L63)) |  |
+| **Definition 50** | `IsDiagonalizableSet` ([TubalAlgebra/Section9/Diagonalizable.lean:75](TubalAlgebra/Section9/Diagonalizable.lean#L75)), `IsDiagonalizableRing` ([TubalAlgebra/Section9/Diagonalizable.lean:78](TubalAlgebra/Section9/Diagonalizable.lean#L78)), `IsJointlyDiagonalizable` ([TubalAlgebra/Section9/Diagonalizable.lean:82](TubalAlgebra/Section9/Diagonalizable.lean#L82)), `IsJointlyDiagonalizableRing` ([TubalAlgebra/Section9/Diagonalizable.lean:86](TubalAlgebra/Section9/Diagonalizable.lean#L86)) |  |
+| **Lemma 51** | `TubalRing.lemma51` ([TubalAlgebra/Section9/Diagonalizable.lean:94](TubalAlgebra/Section9/Diagonalizable.lean#L94)) |  |
+| **Lemma 52** | `TubalRing.lemma52` ([TubalAlgebra/Section9/Diagonalizable.lean:101](TubalAlgebra/Section9/Diagonalizable.lean#L101)) |  |
+| **Lemma 53** | `TubalRing.lemma53` ([TubalAlgebra/Section9/Diagonalizable.lean:114](TubalAlgebra/Section9/Diagonalizable.lean#L114)) |  |
+| **Proposition 54** | `TubalRing.prop54` ([TubalAlgebra/Section9/Diagonalizable.lean:160](TubalAlgebra/Section9/Diagonalizable.lean#L160)) |  |
+| **Definition 55** | `TubalRing.IsTubalSubring` ([TubalAlgebra/Section9/Ideals.lean:31](TubalAlgebra/Section9/Ideals.lean#L31)) |  |
+| **Definition 56** | `TubalRing.principalSet` ([TubalAlgebra/Section9/Ideals.lean:43](TubalAlgebra/Section9/Ideals.lean#L43)), `TubalRing.principal` ([TubalAlgebra/Section9/Ideals.lean:85](TubalAlgebra/Section9/Ideals.lean#L85)) |  |
+| **Lemma 57** | `TubalRing.lemma57` ([TubalAlgebra/Section9/Ideals.lean:47](TubalAlgebra/Section9/Ideals.lean#L47)) |  |
+| **Lemma 58** | `TubalRing.lemma58` ([TubalAlgebra/Section9/Ideals.lean:117](TubalAlgebra/Section9/Ideals.lean#L117)) |  |
+| **Lemma 59** | `TubalRing.lemma59` ([TubalAlgebra/Section9/Ideals.lean:135](TubalAlgebra/Section9/Ideals.lean#L135)); text after it ("proper subsets, lower dimension"): `finrank_principal_lt` ([TubalAlgebra/Section9/Ideals.lean:172](TubalAlgebra/Section9/Ideals.lean#L172)) |  |
+| division ring / tubal sub-field (Sec. 9.4) | `TubalRing.IsDivisionSubring` ([TubalAlgebra/Section9/Ideals.lean:215](TubalAlgebra/Section9/Ideals.lean#L215)), `TubalRing.IsTubalSubfield` ([TubalAlgebra/Section9/Ideals.lean:219](TubalAlgebra/Section9/Ideals.lean#L219)) |  |
+| **Lemma 60** | `TubalRing.lemma60` ([TubalAlgebra/Section9/Ideals.lean:225](TubalAlgebra/Section9/Ideals.lean#L225)) |  |
+| **Corollary 61** | `TubalRing.cor61` ([TubalAlgebra/Section9/Ideals.lean:273](TubalAlgebra/Section9/Ideals.lean#L273)) |  |
+| **Proposition 62** | `TubalRing.prop62` ([TubalAlgebra/Section9/SubField.lean:84](TubalAlgebra/Section9/SubField.lean#L84)) |  |
+| Section 9.6 (bringing it together) | `TubalRing.isDiagonalizableRing` ([TubalAlgebra/Section9/Main.lean:21](TubalAlgebra/Section9/Main.lean#L21)), `theorem11` ([TubalAlgebra/Section9/Main.lean:44](TubalAlgebra/Section9/Main.lean#L44)) |  |
 
 ## Section 10: Additional proofs
 
-| Paper | Lean | Human Verified? |
+| Paper | Lean declaration (file:line) | Human Verified? |
 |---|---|---|
-| **Lemma 63** | `lemma63` (`Realness.lean`) |  |
-| **Lemma 64** | `lemma64` |  |
-| **Lemma 65** | `lemma65` |  |
-| Proof of Lemma 7 | `lemma7` |  |
-| `M_{n,m}`, `M_{n,m}⁻¹`, `𝕂_{n,m}` | `canonicalM`, `canonicalMInv`, `canonicalM_inv`, `canonicalM_admissible`, `realness_canonicalM` (`Canonical.lean`) |  |
-| **Proposition 66** | `prop66`; with conjugation: `prop66_star` |  |
+| **Lemma 63** | `lemma63` ([TubalAlgebra/Realness.lean:246](TubalAlgebra/Realness.lean#L246)) |  |
+| **Lemma 64** | `lemma64` ([TubalAlgebra/Realness.lean:312](TubalAlgebra/Realness.lean#L312)) |  |
+| **Lemma 65** | `lemma65` ([TubalAlgebra/Realness.lean:336](TubalAlgebra/Realness.lean#L336)) |  |
+| Proof of Lemma 7 | `lemma7` ([TubalAlgebra/Realness.lean:416](TubalAlgebra/Realness.lean#L416)) |  |
+| `M_{n,m}`, `M_{n,m}⁻¹`, `𝕂_{n,m}` | `canonicalM` ([TubalAlgebra/Canonical.lean:21](TubalAlgebra/Canonical.lean#L21)), `canonicalMInv` ([TubalAlgebra/Canonical.lean:30](TubalAlgebra/Canonical.lean#L30)), `canonicalM_inv` ([TubalAlgebra/Canonical.lean:308](TubalAlgebra/Canonical.lean#L308)), `canonicalM_admissible` ([TubalAlgebra/Canonical.lean:314](TubalAlgebra/Canonical.lean#L314)), `realness_canonicalM` ([TubalAlgebra/Canonical.lean:326](TubalAlgebra/Canonical.lean#L326)) |  |
+| **Proposition 66** | `prop66` ([TubalAlgebra/Canonical.lean:351](TubalAlgebra/Canonical.lean#L351)); with conjugation: `prop66_star` ([TubalAlgebra/Canonical.lean:360](TubalAlgebra/Canonical.lean#L360)) |  |
 
 ## Appendices
 
-| Paper | Lean | Human Verified? |
+| Paper | Lean declaration (file:line) | Human Verified? |
 |---|---|---|
-| **Example 67** | `AppendixA.example67`, `AppendixA.example67_step3` (`Examples/AppendixA.lean`) |  |
-| **Example 68** | `AppendixA.example68`, `AppendixA.hadamard2_eq_smul_unitary`, `AppendixA.example68_literal_false` |  |
-| Appendix B, weak inverses / nilpotents | `not_vonNeumann_has_nilpotent` (`Examples/AppendixB.lean`) |  |
-| **Example 69** | `example69` |  |
-| **Algorithm 1** ⚠ | `algorithm1`, `algorithm1_correct`, `algorithm1_exists_good_x`, `algorithm1_ae` |  |
-| **Proposition 70** | `prop70` (`Hilbert.lean`) |  |
-| **Proposition 71** ⚠ | `prop71`; "easy to build counter examples": `eq9_fails_in_general` |  |
+| **Example 67** | `AppendixA.example67` ([TubalAlgebra/Examples/AppendixA.lean:179](TubalAlgebra/Examples/AppendixA.lean#L179)), `AppendixA.example67_step3` ([TubalAlgebra/Examples/AppendixA.lean:255](TubalAlgebra/Examples/AppendixA.lean#L255)) |  |
+| **Example 68** | `AppendixA.example68` ([TubalAlgebra/Examples/AppendixA.lean:310](TubalAlgebra/Examples/AppendixA.lean#L310)), `AppendixA.hadamard2_eq_smul_unitary` ([TubalAlgebra/Examples/AppendixA.lean:292](TubalAlgebra/Examples/AppendixA.lean#L292)), `AppendixA.example68_literal_false` ([TubalAlgebra/Examples/AppendixA.lean:354](TubalAlgebra/Examples/AppendixA.lean#L354)) |  |
+| Appendix B, weak inverses / nilpotents | `not_vonNeumann_has_nilpotent` ([TubalAlgebra/Examples/AppendixB.lean:486](TubalAlgebra/Examples/AppendixB.lean#L486)) |  |
+| **Example 69** | `example69` ([TubalAlgebra/Examples/AppendixB.lean:19](TubalAlgebra/Examples/AppendixB.lean#L19)) |  |
+| **Algorithm 1** ⚠ | `algorithm1` ([TubalAlgebra/Examples/AppendixB.lean:75](TubalAlgebra/Examples/AppendixB.lean#L75)), `algorithm1_correct` ([TubalAlgebra/Examples/AppendixB.lean:291](TubalAlgebra/Examples/AppendixB.lean#L291)), `algorithm1_exists_good_x` ([TubalAlgebra/Examples/AppendixB.lean:315](TubalAlgebra/Examples/AppendixB.lean#L315)), `algorithm1_ae` ([TubalAlgebra/Examples/AppendixB.lean:329](TubalAlgebra/Examples/AppendixB.lean#L329)) |  |
+| **Proposition 70** | `prop70` ([TubalAlgebra/Hilbert.lean:74](TubalAlgebra/Hilbert.lean#L74)) |  |
+| **Proposition 71** ⚠ | `prop71` ([TubalAlgebra/Hilbert.lean:91](TubalAlgebra/Hilbert.lean#L91)); "easy to build counter examples": `eq9_fails_in_general` ([TubalAlgebra/Hilbert.lean:114](TubalAlgebra/Hilbert.lean#L114)) |  |
 
 ## Deviations from the literal text (all justified)
 
@@ -190,42 +193,42 @@ those of the paper.
 4. **Definition 23**: the paper writes `X ∈ 𝕂_M^m`, `Y ∈ 𝕂_M^p`, which is ill-typed for
    `T : 𝕂_M^p → 𝕂_M^m`; formalized with `X ∈ 𝕂_M^p`, `Y ∈ 𝕂_M^m`.
 5. **Remark 22** "the converse is not true": formalized as the negation of the universal
-   converse (`remark22_converse_false`), and more sharply for every admissible `M` with `n ≥ 2`
-   (`remark22_converse_false'`); for `n = 1` the converse actually holds.
+   converse (`remark22_converse_false` ([TubalAlgebra/Tensor.lean:181](TubalAlgebra/Tensor.lean#L181))), and more sharply for every admissible `M` with `n ≥ 2`
+   (`remark22_converse_false'` ([TubalAlgebra/Tensor.lean:138](TubalAlgebra/Tensor.lean#L138))); for `n = 1` the converse actually holds.
 6. **Theorem 35**: the paper's `U_{:,1:r,:} ⋆ S_{1:r,1:r,:} ⋆ V^H_{:,1:r,:}` has `r` for `k`
    (typo) and `V^H_{:,1:k,:}` is read as `(V_{:,1:k,:})ᴴ` (the only well-typed reading). The
    statement also records that `[𝒜]_k` has `⋆_M`-rank `≤ k` (part of "optimal rank-`k`
    approximation").
 7. **Theorem 37**: the error formula's factor `|c|⁻¹` is a typo for `|c|⁻²` (Example 68 itself
-   uses `|c|⁻²`); `example68_literal_false` proves that the literal formula fails on the
+   uses `|c|⁻²`); `example68_literal_false` ([TubalAlgebra/Examples/AppendixA.lean:354](TubalAlgebra/Examples/AppendixA.lean#L354)) proves that the literal formula fails on the
    paper's own Example 68. "multirank-`k`" is a typo for "multirank-`r`". The statement also
    records that `[𝒜]_r` has the prescribed transformed slices and multirank `≤ r`.
 8. **Proposition 71** is stated in Appendix C as an extension of Eq. (9) and proved from it, so
    it carries Proposition 70's hypothesis `M = D W` (`D` real invertible diagonal, `W`
-   unitary); without it the statement is false (`eq9_fails_in_general`).
+   unitary); without it the statement is false (`eq9_fails_in_general` ([TubalAlgebra/Hilbert.lean:114](TubalAlgebra/Hilbert.lean#L114))).
 9. **Example 18**: the printed XOR product `(a·b)_i = ∑_j a_i b_{i⊕j}` is a typo for
-   `∑_j a_j b_{i⊕j}`; `example18_literal_not_comm` shows the printed formula is not even
+   `∑_j a_j b_{i⊕j}`; `example18_literal_not_comm` ([TubalAlgebra/Examples/Section3b.lean:356](TubalAlgebra/Examples/Section3b.lean#L356)) shows the printed formula is not even
    commutative.
 10. **Eq. (3)**: `Xᵖ - 1` is a typo for `Xⁿ - 1`.
 11. **Algorithm 1**: "`M ∈ ℝ^{n×n}`" is a typo; `M` is complex in general (cf. Example 4). The
-    random choice of `x` is formalized as an almost-everywhere statement (`algorithm1_ae`).
+    random choice of `x` is formalized as an almost-everywhere statement (`algorithm1_ae` ([TubalAlgebra/Examples/AppendixB.lean:329](TubalAlgebra/Examples/AppendixB.lean#L329))).
 12. **Appendix B**: "a commutative ring … which is not tubal will be reduced, i.e. has an
     element `n` with `n² = 0`" — "reduced" should read "non-reduced".
 13. **Definition 55**: commutativity, associativity, distributivity and ℝ-algebra compatibility
-    of `(V, +, ·)` are inherited from the ambient tubal ring, so `IsTubalSubring` only requires
+    of `(V, +, ·)` are inherited from the ambient tubal ring, so `IsTubalSubring` ([TubalAlgebra/Section9/Ideals.lean:31](TubalAlgebra/Section9/Ideals.lean#L31)) only requires
     closure, a unit, von Neumann regularity inside `V`, and the ideal property.
 14. **Division ring (Sec. 9.4) / Lemma 60**: as recalled in Section 9.4, "a ring is called a
     division ring if every non-zero element has a multiplicative inverse" (no non-triviality
     requirement); with this reading Lemma 60 is true also for `V = {0}`.
-15. **Definition 31**: the `⋆_M`-rank is defined from a chosen `⋆_M`-SVD; `lemma32_any` shows
+15. **Definition 31**: the `⋆_M`-rank is defined from a chosen `⋆_M`-SVD; `lemma32_any` ([TubalAlgebra/TSVD.lean:330](TubalAlgebra/TSVD.lean#L330)) shows
     it does not depend on the choice.
 16. **Theorem 3** is stated as: there is a `CommRing` structure on `ℝⁿ` whose addition is the
     usual one and whose multiplication is `⋆_M` (the ring axioms hold), and additionally via
-    the type `KM M`.
+    the type `KM M` ([TubalAlgebra/Defs.lean:82](TubalAlgebra/Defs.lean#L82)).
 17. **Example 15** "no invertible `M` exists that makes dual numbers isomorphic to `ℝ²`":
     formalized both as "the dual product is not `⋆_M` for any invertible `M`"
-    (`example15_no_M`) and as "the dual numbers are not ring-isomorphic to any `𝕂_M`"
-    (`example15_not_iso`).
+    (`example15_no_M` ([TubalAlgebra/Examples/Section3.lean:462](TubalAlgebra/Examples/Section3.lean#L462))) and as "the dual numbers are not ring-isomorphic to any `𝕂_M`"
+    (`example15_not_iso` ([TubalAlgebra/Examples/Section3.lean:485](TubalAlgebra/Examples/Section3.lean#L485))).
 
 ## Proof strategy notes
 
