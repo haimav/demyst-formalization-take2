@@ -175,7 +175,39 @@ theorem finrank_principal_lt (V : Submodule ℝ (Fin n → ℝ)) (hV : T.IsTubal
     T.principal p < V ∧ T.principal (eV - p) < V ∧
     Module.finrank ℝ (T.principal p) < Module.finrank ℝ V ∧
     Module.finrank ℝ (T.principal (eV - p)) < Module.finrank ℝ V := by
-  sorry
+  have hpe' : T.mul p eV = p := (heV.2 p hp).2
+  have hep' : T.mul eV p = p := (heV.2 p hp).1
+  have hee : T.mul eV eV = eV := (heV.2 eV heV.1).1
+  have hdisj := (T.lemma59 V hV eV heV p hp hpi).1
+  -- membership facts
+  have hp_mem : p ∈ T.principal p := (T.mem_principal p p).2 ⟨p, hpi.symm⟩
+  have hq_mem : eV - p ∈ T.principal (eV - p) := by
+    rw [T.mem_principal]
+    refine ⟨eV - p, ?_⟩
+    rw [T.sub_mul, T.mul_sub, T.mul_sub, hee, hep', hpe', hpi]
+    abel
+  have hle1 : T.principal p ≤ V := by
+    intro x hx
+    obtain ⟨y, rfl⟩ := (T.mem_principal p x).1 hx
+    exact hV.isIdeal p hp y
+  have hle2 : T.principal (eV - p) ≤ V := by
+    intro x hx
+    obtain ⟨y, rfl⟩ := (T.mem_principal _ x).1 hx
+    exact hV.isIdeal _ (V.sub_mem heV.1 hp) y
+  have hlt1 : T.principal p < V := by
+    refine lt_of_le_of_ne hle1 fun h => ?_
+    have h1 : eV - p ∈ T.principal p := h ▸ V.sub_mem heV.1 hp
+    have : eV - p ∈ T.principal p ⊓ T.principal (eV - p) := ⟨h1, hq_mem⟩
+    rw [hdisj, Submodule.mem_bot, sub_eq_zero] at this
+    exact hpe this.symm
+  have hlt2 : T.principal (eV - p) < V := by
+    refine lt_of_le_of_ne hle2 fun h => ?_
+    have h1 : p ∈ T.principal (eV - p) := h ▸ hp
+    have : p ∈ T.principal p ⊓ T.principal (eV - p) := ⟨hp_mem, h1⟩
+    rw [hdisj, Submodule.mem_bot] at this
+    exact hp0 this
+  exact ⟨hlt1, hlt2, Submodule.finrank_lt_finrank_of_lt hlt1,
+    Submodule.finrank_lt_finrank_of_lt hlt2⟩
 
 /-- `(V, +, ·)` is a division ring: every non-zero element of `V` has a multiplicative inverse
 in `V` (with respect to the unit `e_V` of `V`). This is the definition recalled in Section 9.4:
@@ -212,6 +244,29 @@ theorem lemma60 (V : Submodule ℝ (Fin n → ℝ)) (hV : T.IsTubalSubring V)
     rw [← T.isUnitOf_unique he heV]
     exact hab x hxV
 
+/-- Independence of the concatenation of two independent families with disjoint suprema. -/
+private lemma iSupIndep_sum_elim {α : Type*} [CompleteLattice α] [IsModularLattice α]
+    {ι κ : Type*} (f : ι → α) (g : κ → α) (hf : iSupIndep f) (hg : iSupIndep g)
+    (hfg : Disjoint (⨆ i, f i) (⨆ j, g j)) : iSupIndep (Sum.elim f g) := by
+  rw [iSupIndep_def]
+  rintro (a | b)
+  · have hle : (⨆ (y) (_ : y ≠ Sum.inl a), Sum.elim f g y) ≤ (⨆ (i) (_ : i ≠ a), f i) ⊔ ⨆ j, g j := by
+      refine iSup₂_le fun y hy => ?_
+      rcases y with i | j
+      · exact le_sup_of_le_left (le_iSup₂_of_le i (fun h => hy (congrArg Sum.inl h)) le_rfl)
+      · exact le_sup_of_le_right (le_iSup_of_le j le_rfl)
+    refine Disjoint.mono_right hle ?_
+    refine (iSupIndep_def.1 hf a).disjoint_sup_right_of_disjoint_sup_left ?_
+    refine hfg.mono_left (sup_le (le_iSup f a) (iSup₂_le fun i _ => le_iSup f i))
+  · have hle : (⨆ (y) (_ : y ≠ Sum.inr b), Sum.elim f g y) ≤ (⨆ (j) (_ : j ≠ b), g j) ⊔ ⨆ i, f i := by
+      refine iSup₂_le fun y hy => ?_
+      rcases y with i | j
+      · exact le_sup_of_le_right (le_iSup_of_le i le_rfl)
+      · exact le_sup_of_le_left (le_iSup₂_of_le j (fun h => hy (congrArg Sum.inr h)) le_rfl)
+    refine Disjoint.mono_right hle ?_
+    refine (iSupIndep_def.1 hg b).disjoint_sup_right_of_disjoint_sup_left ?_
+    refine hfg.symm.mono_left (sup_le (le_iSup g b) (iSup₂_le fun j _ => le_iSup g j))
+
 /-- **Corollary 61.** Let `V` be a tubal sub-ring. There exist idempotent elements
 `p₁, …, p_N ∈ ℝⁿ`, for a finite `N`, such that `V = (p₁) ⊕ (p₂) ⊕ ⋯ ⊕ (p_N)` and `(pⱼ)` are
 tubal sub-fields for all `j = 1, …, N`. -/
@@ -221,11 +276,59 @@ theorem cor61 (V : Submodule ℝ (Fin n → ℝ)) (hV : T.IsTubalSubring V) :
       (∀ j, T.IsTubalSubfield (T.principal (p j))) ∧
       iSupIndep (fun j => T.principal (p j)) ∧
       (⨆ j, T.principal (p j)) = V := by
-  sorry
+  suffices H : ∀ d (V : Submodule ℝ (Fin n → ℝ)), Module.finrank ℝ V = d →
+      T.IsTubalSubring V → ∃ (N : ℕ) (p : Fin N → Fin n → ℝ),
+        (∀ j, T.IsIdempotent (p j)) ∧ (∀ j, T.IsTubalSubfield (T.principal (p j))) ∧
+        iSupIndep (fun j => T.principal (p j)) ∧ (⨆ j, T.principal (p j)) = V from
+    H _ V rfl hV
+  intro d
+  induction d using Nat.strong_induction_on with
+  | _ d ih =>
+  intro V hdV hV
+  obtain ⟨e, he⟩ := hV.unital
+  by_cases hdiv : T.IsDivisionSubring V
+  · have hVe := T.eq_principal_of_isUnitOf hV he
+    refine ⟨1, fun _ => e, fun _ => (he.2 e he.1).1, fun _ => ?_, iSupIndep_subsingleton _, ?_⟩
+    · rw [← hVe]; exact ⟨hV, hdiv⟩
+    · rw [ciSup_const, ← hVe]
+  · obtain ⟨p, hp, hpi, hp0, hpe⟩ := T.lemma60 V hV hdiv
+    have hlt := T.finrank_principal_lt V hV e he p hp hpi hp0 (hpe e he)
+    have h59 := T.lemma59 V hV e he p hp hpi
+    obtain ⟨N₁, p₁, hi₁, hf₁, hind₁, hsup₁⟩ :=
+      ih _ (hdV ▸ hlt.2.2.1) (T.principal p) rfl (T.principal_isTubalSubring p)
+    obtain ⟨N₂, p₂, hi₂, hf₂, hind₂, hsup₂⟩ :=
+      ih _ (hdV ▸ hlt.2.2.2) (T.principal (e - p)) rfl (T.principal_isTubalSubring _)
+    let q : Fin (N₁ + N₂) → Fin n → ℝ := Sum.elim p₁ p₂ ∘ finSumFinEquiv.symm
+    have hq : (fun j => T.principal (q j)) =
+        Sum.elim (fun j => T.principal (p₁ j)) (fun j => T.principal (p₂ j)) ∘
+          finSumFinEquiv.symm := by
+      funext j
+      simp only [q, Function.comp_apply]
+      rcases finSumFinEquiv.symm j with a | b <;> rfl
+    refine ⟨N₁ + N₂, q, fun j => ?_, fun j => ?_, ?_, ?_⟩
+    · simp only [q, Function.comp_apply]
+      rcases finSumFinEquiv.symm j with a | b
+      · exact hi₁ a
+      · exact hi₂ b
+    · simp only [q, Function.comp_apply]
+      rcases finSumFinEquiv.symm j with a | b
+      · exact hf₁ a
+      · exact hf₂ b
+    · rw [hq]
+      refine (iSupIndep_sum_elim _ _ hind₁ hind₂ ?_).comp finSumFinEquiv.symm.injective
+      rw [hsup₁, hsup₂, disjoint_iff]
+      exact h59.1
+    · rw [hq, Function.comp_def, Equiv.iSup_comp (g := Sum.elim (fun j => T.principal (p₁ j))
+        (fun j => T.principal (p₂ j))) finSumFinEquiv.symm, iSup_sum]
+      simp only [Sum.elim_inl, Sum.elim_inr]
+      rw [hsup₁, hsup₂, h59.2]
 
 /-- `ℝⁿ` itself is a tubal sub-ring. -/
 theorem top_isTubalSubring : T.IsTubalSubring ⊤ := by
-  sorry
+  refine ⟨fun _ _ _ _ => Submodule.mem_top, ⟨T.one, Submodule.mem_top, fun v _ =>
+    ⟨T.one_mul v, T.mul_one v⟩⟩, fun a _ => ?_, fun _ _ _ => Submodule.mem_top⟩
+  obtain ⟨x, hx⟩ := T.vonNeumann a
+  exact ⟨x, Submodule.mem_top, hx⟩
 
 end TubalRing
 
