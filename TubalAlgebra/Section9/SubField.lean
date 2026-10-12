@@ -81,8 +81,10 @@ theorem isDiagonalizable_of_mem (a : Fin n → ℝ) : T.IsDiagonalizable a := by
   exact (T.lemma49 a).1.2 (isDiagonalizableMat_of_squarefree _ _ hsqC hRC)
 
 /-- **Proposition 62.** A tubal sub-field is diagonalizable. -/
-theorem prop62 (V : Submodule ℝ (Fin n → ℝ)) (_hV : T.IsTubalSubfield V) :
+theorem prop62 (V : Submodule ℝ (Fin n → ℝ)) (hV : T.IsTubalSubfield V) :
     T.IsDiagonalizableSet V := by
+  -- every element of a tubal ring is diagonalizable (`isDiagonalizable_of_mem`)
+  have _ := hV
   exact fun a _ => T.isDiagonalizable_of_mem a
 
 end TubalRing
