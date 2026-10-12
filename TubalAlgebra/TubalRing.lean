@@ -55,7 +55,20 @@ structure TubalRing (n : ℕ) where
 there exists a *unique* `x` with `a = a·x·a` and `x = x·a·x`. -/
 theorem vonNeumann_unique (R : Type*) [CommRing R] (h : IsVonNeumannRegularRing R) (a : R) :
     ∃! x : R, a = a * x * a ∧ x = x * a * x := by
-  sorry
+  obtain ⟨x, hx⟩ := h a
+  have hxa1 : a = a * (x * a * x) * a := by linear_combination (1 + a * x) * hx
+  have hxa2 : x * a * x = (x * a * x) * a * (x * a * x) := by
+    linear_combination (x ^ 2 + a * x ^ 3) * hx
+  refine ⟨x * a * x, ⟨hxa1, hxa2⟩, ?_⟩
+  rintro y ⟨h1, h2⟩
+  -- `a y` and `a (x a x)` are equal idempotents
+  have e : a * y = a * (x * a * x) := by
+    linear_combination (x + y) * hx - x * h1
+  calc y = y * (a * y) := by linear_combination h2
+    _ = y * (a * (x * a * x)) := by rw [e]
+    _ = (a * y) * (x * a * x) := by ring
+    _ = (a * (x * a * x)) * (x * a * x) := by rw [e]
+    _ = x * a * x := by linear_combination -hxa2
 
 namespace TubalRing
 
@@ -69,33 +82,34 @@ theorem one_mul (a : Fin n → ℝ) : T.mul T.one a = a := (Classical.choose_spe
 theorem mul_one (a : Fin n → ℝ) : T.mul a T.one = a := (Classical.choose_spec T.exists_one a).2
 
 theorem one_unique (e : Fin n → ℝ) (he : ∀ a, T.mul e a = a) : e = T.one := by
-  sorry
+  calc e = T.mul e T.one := (T.mul_one e).symm
+    _ = T.one := he T.one
 
 theorem mul_zero (a : Fin n → ℝ) : T.mul a 0 = 0 := by
-  sorry
+  have h := T.left_distrib a 0 0
+  rw [add_zero] at h
+  exact add_eq_left.mp h.symm
 
 theorem zero_mul (a : Fin n → ℝ) : T.mul 0 a = 0 := by
-  sorry
+  have h := T.right_distrib 0 0 a
+  rw [add_zero] at h
+  exact add_eq_left.mp h.symm
 
 theorem mul_neg (a b : Fin n → ℝ) : T.mul a (-b) = -T.mul a b := by
-  sorry
+  have h := T.left_distrib a (-b) b
+  rw [neg_add_cancel, T.mul_zero] at h
+  exact eq_neg_of_add_eq_zero_left h.symm
 
 theorem neg_mul (a b : Fin n → ℝ) : T.mul (-a) b = -T.mul a b := by
-  sorry
+  have h := T.right_distrib (-a) a b
+  rw [neg_add_cancel, T.zero_mul] at h
+  exact eq_neg_of_add_eq_zero_left h.symm
 
 theorem mul_sub (a b c : Fin n → ℝ) : T.mul a (b - c) = T.mul a b - T.mul a c := by
-  sorry
+  rw [sub_eq_add_neg, T.left_distrib, T.mul_neg, ← sub_eq_add_neg]
 
 theorem sub_mul (a b c : Fin n → ℝ) : T.mul (a - b) c = T.mul a c - T.mul b c := by
-  sorry
-
-theorem mul_sum {ι : Type*} (s : Finset ι) (a : Fin n → ℝ) (f : ι → Fin n → ℝ) :
-    T.mul a (∑ i ∈ s, f i) = ∑ i ∈ s, T.mul a (f i) := by
-  sorry
-
-theorem sum_mul {ι : Type*} (s : Finset ι) (f : ι → Fin n → ℝ) (a : Fin n → ℝ) :
-    T.mul (∑ i ∈ s, f i) a = ∑ i ∈ s, T.mul (f i) a := by
-  sorry
+  rw [sub_eq_add_neg, T.right_distrib, T.neg_mul, ← sub_eq_add_neg]
 
 /-- For each `a`, the map `x ↦ a · x` as an `ℝ`-linear map. -/
 def mulLeft (a : Fin n → ℝ) : (Fin n → ℝ) →ₗ[ℝ] (Fin n → ℝ) where
@@ -107,19 +121,14 @@ def mulLeft (a : Fin n → ℝ) : (Fin n → ℝ) →ₗ[ℝ] (Fin n → ℝ) wh
 def mulBilin : (Fin n → ℝ) →ₗ[ℝ] (Fin n → ℝ) →ₗ[ℝ] (Fin n → ℝ) :=
   LinearMap.mk₂ ℝ T.mul T.right_distrib T.smul_mul T.left_distrib T.mul_smul
 
-/-! ### The weak inverse `a⁻` (Section 9) -/
+theorem mul_sum {ι : Type*} (s : Finset ι) (a : Fin n → ℝ) (f : ι → Fin n → ℝ) :
+    T.mul a (∑ i ∈ s, f i) = ∑ i ∈ s, T.mul a (f i) := by
+  exact map_sum (T.mulLeft a) f s
 
-/-- The weak inverse `a⁻`: the unique element with `a = a·a⁻·a` and `a⁻ = a⁻·a·a⁻`. -/
-def winv (a : Fin n → ℝ) : Fin n → ℝ :=
-  Classical.choose (show ∃ x, a = T.mul (T.mul a x) a ∧ x = T.mul (T.mul x a) x by sorry)
-
-theorem winv_spec (a : Fin n → ℝ) :
-    a = T.mul (T.mul a (T.winv a)) a ∧ T.winv a = T.mul (T.mul (T.winv a) a) (T.winv a) := by
-  sorry
-
-theorem winv_unique (a y : Fin n → ℝ) (h1 : a = T.mul (T.mul a y) a)
-    (h2 : y = T.mul (T.mul y a) y) : y = T.winv a := by
-  sorry
+theorem sum_mul {ι : Type*} (s : Finset ι) (f : ι → Fin n → ℝ) (a : Fin n → ℝ) :
+    T.mul (∑ i ∈ s, f i) a = ∑ i ∈ s, T.mul (f i) a := by
+  rw [T.mul_comm, T.mul_sum]
+  exact Finset.sum_congr rfl fun i _ => T.mul_comm _ _
 
 /-! ### Mathlib structures on a tubal ring -/
 
@@ -183,11 +192,11 @@ instance instCommRing : CommRing T.Elem :=
     mul_zero := fun a => Elem.ext (T.mul_zero a.vec)
     mul_comm := fun a b => Elem.ext (T.mul_comm a.vec b.vec)
     natCast := fun k => k • (1 : T.Elem)
-    natCast_zero := by sorry
-    natCast_succ := by sorry
+    natCast_zero := zero_nsmul _
+    natCast_succ := fun k => succ_nsmul _ k
     intCast := fun k => k • (1 : T.Elem)
-    intCast_ofNat := by sorry
-    intCast_negSucc := by sorry
+    intCast_ofNat := fun k => natCast_zsmul _ k
+    intCast_negSucc := fun k => negSucc_zsmul _ k
     npow := fun k a => npowRec k a
     npow_zero := fun _ => rfl
     npow_succ := fun _ _ => rfl }
@@ -206,9 +215,34 @@ def linearEquivVec : T.Elem ≃ₗ[ℝ] (Fin n → ℝ) where
   right_inv _ := rfl
 
 theorem isVonNeumannRegularRing : IsVonNeumannRegularRing T.Elem := by
-  sorry
+  intro a
+  obtain ⟨x, hx⟩ := T.vonNeumann a.vec
+  exact ⟨⟨x⟩, Elem.ext hx⟩
 
 end Elem
+
+/-! ### The weak inverse `a⁻` (Section 9) -/
+
+/-- The weak inverse `a⁻`: the unique element with `a = a·a⁻·a` and `a⁻ = a⁻·a·a⁻`. -/
+def winv (a : Fin n → ℝ) : Fin n → ℝ :=
+  Classical.choose (show ∃ x, a = T.mul (T.mul a x) a ∧ x = T.mul (T.mul x a) x by
+    obtain ⟨⟨x⟩, ⟨h1, h2⟩, -⟩ :=
+      vonNeumann_unique T.Elem Elem.isVonNeumannRegularRing (⟨a⟩ : T.Elem)
+    exact ⟨x, congrArg Elem.vec h1, congrArg Elem.vec h2⟩)
+
+theorem winv_spec (a : Fin n → ℝ) :
+    a = T.mul (T.mul a (T.winv a)) a ∧ T.winv a = T.mul (T.mul (T.winv a) a) (T.winv a) := by
+  unfold winv
+  generalize_proofs h
+  exact Classical.choose_spec h
+
+theorem winv_unique (a y : Fin n → ℝ) (h1 : a = T.mul (T.mul a y) a)
+    (h2 : y = T.mul (T.mul y a) y) : y = T.winv a := by
+  obtain ⟨z, -, hz⟩ := vonNeumann_unique T.Elem Elem.isVonNeumannRegularRing (⟨a⟩ : T.Elem)
+  have hy := hz ⟨y⟩ ⟨Elem.ext h1, Elem.ext h2⟩
+  have hw := hz ⟨T.winv a⟩ ⟨Elem.ext (T.winv_spec a).1, Elem.ext (T.winv_spec a).2⟩
+  exact congrArg Elem.vec (hy.trans hw.symm)
+
 
 end TubalRing
 
@@ -217,14 +251,31 @@ end TubalRing
 /-- For admissible `M`, `(ℝⁿ, +, ⋆_M)` is a tubal ring. -/
 def KM.toTubalRing (M : Matrix (Fin n) (Fin n) ℂ) [Fact (Admissible M)] : TubalRing n where
   mul a b := (KM.mk a * KM.mk b : KM M).vec
-  mul_assoc a b c := by sorry
-  left_distrib a b c := by sorry
-  right_distrib a b c := by sorry
-  mul_comm a b := by sorry
-  exists_one := by sorry
-  vonNeumann a := by sorry
-  smul_mul r a b := by sorry
-  mul_smul r a b := by sorry
+  mul_assoc a b c := by
+    change ((KM.mk a * KM.mk b) * KM.mk c : KM M).vec = (KM.mk a * (KM.mk b * KM.mk c) : KM M).vec
+    rw [mul_assoc]
+  left_distrib a b c := by
+    change (KM.mk a * (KM.mk b + KM.mk c) : KM M).vec = _
+    rw [mul_add]; rfl
+  right_distrib a b c := by
+    change ((KM.mk a + KM.mk b) * KM.mk c : KM M).vec = _
+    rw [add_mul]; rfl
+  mul_comm a b := by
+    rw [mul_comm]
+  exists_one := ⟨(1 : KM M).vec, fun a => ⟨by
+    change ((1 : KM M) * KM.mk a).vec = a
+    rw [one_mul], by
+    change (KM.mk a * (1 : KM M)).vec = a
+    rw [mul_one]⟩⟩
+  vonNeumann a := by
+    obtain ⟨x, hx⟩ := KM.isVonNeumannRegularRing M (KM.mk a)
+    exact ⟨x.vec, congrArg KM.vec hx⟩
+  smul_mul r a b := by
+    change ((r • KM.mk a) * KM.mk b : KM M).vec = (r • (KM.mk a * KM.mk b) : KM M).vec
+    rw [KM.smul_mul_assoc']
+  mul_smul r a b := by
+    change (KM.mk a * (r • KM.mk b) : KM M).vec = (r • (KM.mk a * KM.mk b) : KM M).vec
+    rw [KM.mul_smul_comm']
 
 theorem KM.toTubalRing_mul (M : Matrix (Fin n) (Fin n) ℂ) [Fact (Admissible M)]
     (a b : Fin n → ℝ) :
@@ -236,6 +287,7 @@ then `(ℝⁿ, +, ⋆_M)` is a tubal ring. -/
 theorem exists_tubalRing_of_starM (M : Matrix (Fin n) (Fin n) ℂ) (hM : IsUnit M)
     (hreal : ∀ a b : Fin n → ℝ, starMC M (toC a) (toC b) ∈ Set.range toC) :
     ∃ T : TubalRing n, ∀ a b, toC (T.mul a b) = starMC M (toC a) (toC b) := by
-  sorry
+  have : Fact (Admissible M) := ⟨⟨hM, (lemma65 M hM).mp hreal⟩⟩
+  exact ⟨KM.toTubalRing M, KM.toTubalRing_mul M⟩
 
 end Tubal
