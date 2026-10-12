@@ -2,7 +2,15 @@
 
 Paper: H. Avron, U. Mor, *Demystifying Tubal Tensor Algebra* (arXiv:2506.03311v2).
 Lean project: `TubalAlgebra` (Lean 4 v4.34.1, Mathlib v4.34.1). All declarations live in the
-namespace `Tubal`. Build with `lake build`.
+namespace `Tubal` (the Appendix A examples in `Tubal.AppendixA`, the tubal-ring lemmas of
+Section 9 in `Tubal.TubalRing`). Build with `lake build`.
+
+**Status:** every numbered result is formalized and fully proved — there is no `sorry`, no
+`admit`, no `native_decide`, and **no axiom beyond Lean's standard `propext`,
+`Classical.choice`, `Quot.sound`** (not even for the classical results the paper cites: the
+Frobenius theorem, simultaneous diagonalization, matrix SVD and the Eckart–Young theorem are all
+proved). `python3 scripts/axiom_audit.py` runs `#print axioms` on all 484 public declarations
+and checks this.
 
 Every numbered result of the paper is listed below, in order, with the Lean declaration(s) that
 formalize it. **Deviations** from the literal text (typos in the paper, implicit assumptions)
@@ -158,8 +166,8 @@ those of the paper.
 
 | Paper | Lean |
 |---|---|
-| **Example 67** | `example67`, `example67_step3` (`Examples/AppendixA.lean`) |
-| **Example 68** | `example68`, `hadamard2_eq_smul_unitary`, `example68_literal_false` |
+| **Example 67** | `AppendixA.example67`, `AppendixA.example67_step3` (`Examples/AppendixA.lean`) |
+| **Example 68** | `AppendixA.example68`, `AppendixA.hadamard2_eq_smul_unitary`, `AppendixA.example68_literal_false` |
 | Appendix B, weak inverses / nilpotents | `not_vonNeumann_has_nilpotent` (`Examples/AppendixB.lean`) |
 | **Example 69** | `example69` |
 | **Algorithm 1** ⚠ | `algorithm1`, `algorithm1_correct`, `algorithm1_exists_good_x`, `algorithm1_ae` |
@@ -224,6 +232,20 @@ those of the paper.
   diagonalizable) instead of the Frobenius dimension argument; Theorem 11 is then assembled
   exactly as in Section 9.6 (Cor. 61 + Prop. 62 + Lemma 53 + Prop. 54). Proposition 13/66 use
   conjugacy of the "conjugation involutions" of the rows.
-* No axioms are added: every theorem depends only on Lean's standard axioms
-  (`propext`, `Classical.choice`, `Quot.sound`). (See the axiom audit at the end of
-  `TubalAlgebra.lean` / the final report.)
+* Classical background proved from scratch on top of Mathlib (no axioms assumed): the
+  Frobenius theorem (`Frobenius.lean`, elementary proof via `i, j, k` with `i² = j² = -1`,
+  `ji = -ij`), simultaneous diagonalization (`Section9/SimulDiag.lean`), existence of the SVD
+  over `ℝ`/`ℂ` and the Eckart–Young theorem (`MatrixSVD.lean`, via a projector/trace-weight
+  argument).
+* Theorem 30 for a general admissible `M` requires choosing the slice SVDs consistently with
+  the conjugation pattern of `M` (real SVDs for real rows, conjugate SVDs for conjugate rows) so
+  that `𝒰, 𝒮, 𝒱` are real; the paper's proof glosses over this, the formal proof does it.
+
+## Verification
+
+* `lake build` — builds the whole library without errors or `sorry` warnings.
+* `python3 scripts/axiom_audit.py` — `#print axioms` for all 484 public theorems, lemmas,
+  definitions and instances; all depend only on `propext`, `Classical.choice`, `Quot.sound`.
+* Statement faithfulness was independently reviewed against the paper (one reviewer per
+  section plus a completeness critic, each finding adversarially re-verified); the
+  confirmed gaps (all low severity: missing side-claims) were added.
