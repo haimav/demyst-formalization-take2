@@ -133,9 +133,9 @@ theorem tHat_tInv [Fact (Admissible M)] {m p : ℕ} (X : Fin n → Matrix (Fin m
     (hX : SlicesConjPattern M X) : tHat (tInv X : Matrix (Fin m) (Fin p) (KM M)) = X := by
   funext j i k
   have hM := (Fact.out : Admissible M)
-  have hr := inv_mulVec_mem_range_of_conjPattern M hM.1 hM.2 (hX i k)
+  have hr := inv_mulVec_mem_realVectors_of_conjPattern M hM.1 hM.2 (hX i k)
   simp only [tHat, tInv, KM.hat, KM.vec_mk]
-  rw [toC_re_of_mem_range hr, mulVec_inv_mulVec' hM.1]
+  rw [toC_re_of_mem_realVectors hr, mulVec_inv_mulVec' hM.1]
 
 theorem tInv_tHat [Fact (Admissible M)] {m p : ℕ} (A : Matrix (Fin m) (Fin p) (KM M)) :
     tInv (tHat A) = A := by

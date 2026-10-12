@@ -41,6 +41,32 @@ lemma toC_injective : Function.Injective (toC : (Fin n → ℝ) → Fin n → �
   have := congrFun h i
   simpa using this
 
+/-- The real vectors `ℝⁿ`, viewed as a subset of `ℂⁿ`: the image of the embedding `toC`.
+The paper's "`v ∈ ℝⁿ`" for a complex vector `v` is `v ∈ realVectors n`. Equivalently, every
+entry of `v` has zero imaginary part (`mem_realVectors_iff_im`), or `v` equals its entry-wise
+complex conjugate (`mem_realVectors_iff_conj`). -/
+def realVectors (n : ℕ) : Set (Fin n → ℂ) := Set.range toC
+
+/-- Unfolding `realVectors`: `v` is real iff it is the embedding of a vector of `ℝⁿ`. -/
+lemma mem_realVectors_iff_exists {v : Fin n → ℂ} :
+    v ∈ realVectors n ↔ ∃ a : Fin n → ℝ, toC a = v := Iff.rfl
+
+/-- A complex vector is real iff all of its entries have zero imaginary part. -/
+theorem mem_realVectors_iff_im {v : Fin n → ℂ} :
+    v ∈ realVectors n ↔ ∀ i, (v i).im = 0 := by
+  constructor
+  · rintro ⟨a, rfl⟩ i
+    simp
+  · intro h
+    exact ⟨fun i => (v i).re, funext fun i => Complex.ext (by simp) (by simp [h i])⟩
+
+open ComplexConjugate in
+/-- A complex vector is real iff it equals its entry-wise complex conjugate. -/
+theorem mem_realVectors_iff_conj {v : Fin n → ℂ} :
+    v ∈ realVectors n ↔ ∀ i, conj (v i) = v i := by
+  rw [mem_realVectors_iff_im]
+  exact forall_congr' fun i => Complex.conj_eq_iff_im.symm
+
 /-- **Eq. (5)**: `a ⋆_M b := M⁻¹ (M a • M b)`, where `•` is the Hadamard (entry-wise) product,
 which for functions `Fin n → ℂ` is the pointwise product `*`. -/
 def starMC (M : Matrix (Fin n) (Fin n) ℂ) (a b : Fin n → ℂ) : Fin n → ℂ :=

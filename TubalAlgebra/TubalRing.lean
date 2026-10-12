@@ -292,7 +292,7 @@ theorem KM.toTubalRing_mul (M : Matrix (Fin n) (Fin n) ℂ) [Fact (Admissible M)
 /-- Conversely to Theorem 11: if `M` is invertible and `a ⋆_M b` is real for all real `a, b`,
 then `(ℝⁿ, +, ⋆_M)` is a tubal ring. -/
 theorem exists_tubalRing_of_starM (M : Matrix (Fin n) (Fin n) ℂ) (hM : IsUnit M)
-    (hreal : ∀ a b : Fin n → ℝ, starMC M (toC a) (toC b) ∈ Set.range toC) :
+    (hreal : ∀ a b : Fin n → ℝ, starMC M (toC a) (toC b) ∈ realVectors n) :
     ∃ T : TubalRing n, ∀ a b, toC (T.mul a b) = starMC M (toC a) (toC b) := by
   have : Fact (Admissible M) := ⟨⟨hM, (lemma65 M hM).mp hreal⟩⟩
   exact ⟨KM.toTubalRing M, KM.toTubalRing_mul M⟩

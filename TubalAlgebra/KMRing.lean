@@ -48,7 +48,7 @@ variable {M : Matrix (Fin n) (Fin n) ℂ}
   funext i; simp [toC]
 
 /-- If a complex vector is real, then it is the embedding of its real part. -/
-lemma _root_.Tubal.toC_re_of_mem_range {v : Fin n → ℂ} (hv : v ∈ Set.range toC) :
+lemma _root_.Tubal.toC_re_of_mem_realVectors {v : Fin n → ℂ} (hv : v ∈ realVectors n) :
     toC (fun i => (v i).re) = v := by
   obtain ⟨c, rfl⟩ := hv
   funext i; simp [toC]
@@ -104,21 +104,21 @@ theorem exists_hat_eq {y : Fin n → ℂ} (hy : ConjPattern M y) : ∃ a : KM M,
 
 /-- The product of `KM M` is exactly `⋆_M` (Eq. (5)). -/
 theorem toC_vec_mul (a b : KM M) : toC (a * b).vec = starMC M (toC a.vec) (toC b.vec) := by
-  exact toC_re_of_mem_range ((lemma65 M hM.out.1).mpr hM.out.2 a.vec b.vec)
+  exact toC_re_of_mem_realVectors ((lemma65 M hM.out.1).mpr hM.out.2 a.vec b.vec)
 
 theorem toC_vec_one : toC (1 : KM M).vec = M⁻¹ *ᵥ (1 : Fin n → ℂ) := by
-  exact toC_re_of_mem_range (inv_mulVec_mem_range_of_conjPattern M hM.out.1 hM.out.2
+  exact toC_re_of_mem_realVectors (inv_mulVec_mem_realVectors_of_conjPattern M hM.out.1 hM.out.2
     (ConjPattern.one M))
 
 /-- The conjugate of `KM M` is exactly Eq. (6). -/
 theorem toC_vec_star (a : KM M) : toC (star a).vec = M⁻¹ *ᵥ star (M *ᵥ toC a.vec) := by
-  exact toC_re_of_mem_range (inv_mulVec_mem_range_of_conjPattern M hM.out.1 hM.out.2
+  exact toC_re_of_mem_realVectors (inv_mulVec_mem_realVectors_of_conjPattern M hM.out.1 hM.out.2
     (conjPattern_mulVec_toC M a.vec).star)
 
 /-- The weak inverse is exactly Eq. (7). -/
 theorem toC_vec_weakInv (a : KM M) :
     toC (weakInv a).vec = M⁻¹ *ᵥ pinvVec (M *ᵥ toC a.vec) := by
-  exact toC_re_of_mem_range (lemma7 M hM.out.1 hM.out.2 a.vec)
+  exact toC_re_of_mem_realVectors (lemma7 M hM.out.1 hM.out.2 a.vec)
 
 @[simp] theorem hat_mul (a b : KM M) : (a * b).hat = a.hat * b.hat := by
   rw [hat, toC_vec_mul, starMC, mulVec_inv_mulVec' hM.out.1]

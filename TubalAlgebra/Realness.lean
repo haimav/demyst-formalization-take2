@@ -102,9 +102,9 @@ theorem conjPattern_mulVec_toC (M : Matrix (Fin n) (Fin n) ℂ) (a : Fin n → �
     simp only [mulVec, dotProduct, map_sum, map_mul, toC_apply, Complex.conj_ofReal, hjk']
 
 /-- For admissible `M`, `M⁻¹ y` is real whenever `y` respects the conjugation pattern. -/
-theorem inv_mulVec_mem_range_of_conjPattern (M : Matrix (Fin n) (Fin n) ℂ) (hM : IsUnit M)
+theorem inv_mulVec_mem_realVectors_of_conjPattern (M : Matrix (Fin n) (Fin n) ℂ) (hM : IsUnit M)
     (hrow : ConjRowCondition M) {y : Fin n → ℂ} (hy : ConjPattern M y) :
-    M⁻¹ *ᵥ y ∈ Set.range toC := by
+    M⁻¹ *ᵥ y ∈ realVectors n := by
   set x := M⁻¹ *ᵥ y with hx
   have hMx : M *ᵥ x = y := mulVec_inv_mulVec' hM y
   have hconj : M *ᵥ (star x) = y := by
@@ -128,7 +128,7 @@ theorem conjPattern_iff_mem_range (M : Matrix (Fin n) (Fin n) ℂ) (hM : IsUnit 
     ConjPattern M y ↔ ∃ a : Fin n → ℝ, y = M *ᵥ toC a := by
   constructor
   · intro hy
-    obtain ⟨a, ha⟩ := inv_mulVec_mem_range_of_conjPattern M hM hrow hy
+    obtain ⟨a, ha⟩ := inv_mulVec_mem_realVectors_of_conjPattern M hM hrow hy
     exact ⟨a, by rw [ha, mulVec_inv_mulVec' hM]⟩
   · rintro ⟨a, rfl⟩
     exact conjPattern_mulVec_toC M a
@@ -269,14 +269,14 @@ theorem lemma63 (M : Matrix (Fin n) (Fin n) ℂ) (hM : IsUnit M) (hrow : ConjRow
           · subst h2
             exact absurd (eq_of_rowReal_of_rowConjOf hM hj (rowConjOf_symm hik)).symm h1
           · simp [h1, h2]
-    obtain ⟨c, hc⟩ := inv_mulVec_mem_range_of_conjPattern M hM hrow hpat
+    obtain ⟨c, hc⟩ := inv_mulVec_mem_realVectors_of_conjPattern M hM hrow hpat
     have := congrFun hc i
     rw [colj] at this
     rw [← this]; simp [toC]
   · intro j k hj hjk
     have hne : j ≠ k := fun h => hj (rowReal_of_rowConjOf_self (h ▸ hjk))
-    obtain ⟨c1, hc1⟩ := inv_mulVec_mem_range_of_conjPattern M hM hrow (conjPattern_pair hM hj hjk 1)
-    obtain ⟨c2, hc2⟩ := inv_mulVec_mem_range_of_conjPattern M hM hrow (conjPattern_pair hM hj hjk I)
+    obtain ⟨c1, hc1⟩ := inv_mulVec_mem_realVectors_of_conjPattern M hM hrow (conjPattern_pair hM hj hjk 1)
+    obtain ⟨c2, hc2⟩ := inv_mulVec_mem_realVectors_of_conjPattern M hM hrow (conjPattern_pair hM hj hjk I)
     have key : ∀ i, M⁻¹ i j = starRingEnd ℂ (M⁻¹ i k) := by
       intro i
       have e1 := congrFun hc1 i
@@ -314,7 +314,7 @@ theorem lemma64 (M : Matrix (Fin n) (Fin n) ℂ) (hM : IsUnit M) (hrow : ConjRow
   have hcol : ∀ l : Fin n, ∃ r : Fin n → ℝ,
       M⁻¹ *ᵥ star (M *ᵥ toC (Pi.single l 1)) = toC r := by
     intro l
-    obtain ⟨r, hr⟩ := inv_mulVec_mem_range_of_conjPattern M hM hrow
+    obtain ⟨r, hr⟩ := inv_mulVec_mem_realVectors_of_conjPattern M hM hrow
       (conjPattern_mulVec_toC M (Pi.single l 1)).star
     exact ⟨r, hr.symm⟩
   choose r hr using hcol
@@ -334,7 +334,7 @@ theorem lemma64 (M : Matrix (Fin n) (Fin n) ℂ) (hM : IsUnit M) (hrow : ConjRow
 Eq. (5) is real for every `a, b ∈ ℝⁿ`, if and only if every row of `M` is either real, or is
 conjugate to exactly one other row of `M`. -/
 theorem lemma65 (M : Matrix (Fin n) (Fin n) ℂ) (hM : IsUnit M) :
-    (∀ a b : Fin n → ℝ, starMC M (toC a) (toC b) ∈ Set.range toC) ↔ ConjRowCondition M := by
+    (∀ a b : Fin n → ℝ, starMC M (toC a) (toC b) ∈ realVectors n) ↔ ConjRowCondition M := by
   constructor
   · intro h
     have hdet : IsUnit M.det := (Matrix.isUnit_iff_isUnit_det M).mp hM
@@ -400,21 +400,21 @@ theorem lemma65 (M : Matrix (Fin n) (Fin n) ℂ) (hM : IsUnit M) :
       rintro j' ⟨_, hc'⟩
       exact rowConjOf_unique' hM hc' hc
   · intro hrow a b
-    exact inv_mulVec_mem_range_of_conjPattern M hM hrow
+    exact inv_mulVec_mem_realVectors_of_conjPattern M hM hrow
       ((conjPattern_mulVec_toC M a).mul (conjPattern_mulVec_toC M b))
 
 /-- **Lemma 2.** Let `M ∈ ℂ^{n×n}` be an invertible matrix. Then `a ⋆_M b ∈ ℝⁿ` for all
 `a, b ∈ ℝⁿ`, if and only if every row of `M` is either real, or obtained by entry-wise complex
 conjugation of exactly one other row of `M`. -/
 theorem lemma2 (M : Matrix (Fin n) (Fin n) ℂ) (hM : IsUnit M) :
-    (∀ a b : Fin n → ℝ, starMC M (toC a) (toC b) ∈ Set.range toC) ↔ ConjRowCondition M :=
+    (∀ a b : Fin n → ℝ, starMC M (toC a) (toC b) ∈ realVectors n) ↔ ConjRowCondition M :=
   lemma65 M hM
 
 /-- **Lemma 7.** Let `M ∈ ℂ^{n×n}` be an invertible matrix. Suppose that every row of `M` is
 either real, or is conjugate to exactly one other row of `M`. Then `x⁻ = M⁻¹ (M x)⁺` is real,
 for every `x ∈ ℝⁿ`. -/
 theorem lemma7 (M : Matrix (Fin n) (Fin n) ℂ) (hM : IsUnit M) (hrow : ConjRowCondition M)
-    (x : Fin n → ℝ) : M⁻¹ *ᵥ pinvVec (M *ᵥ toC x) ∈ Set.range toC :=
-  inv_mulVec_mem_range_of_conjPattern M hM hrow (conjPattern_mulVec_toC M x).pinvVec
+    (x : Fin n → ℝ) : M⁻¹ *ᵥ pinvVec (M *ᵥ toC x) ∈ realVectors n :=
+  inv_mulVec_mem_realVectors_of_conjPattern M hM hrow (conjPattern_mulVec_toC M x).pinvVec
 
 end Tubal
