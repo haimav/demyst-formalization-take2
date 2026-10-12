@@ -48,10 +48,40 @@ theorem theorem19 (M : Matrix (Fin n) (Fin n) ℂ) [Fact (Admissible M)] (m : �
     (∃ b : Module.Basis (Fin m) (KM M) (Fin m → KM M), ∀ i, b i = stdOriented m i) ∧
     (n ≠ 0 → ∀ (ι : Type) (b : Module.Basis ι (KM M) (Fin m → KM M)), Cardinal.mk ι = m) ∧
     (n ≠ 0 → Module.finrank (KM M) (Fin m → KM M) = m) := by
-  sorry
+  have hfree : Module.Free (KM M) (Fin m → KM M) := inferInstance
+  refine ⟨hfree, ⟨Pi.basisFun (KM M) (Fin m), fun i => Pi.basisFun_apply _ _ i⟩, ?_, ?_⟩
+  · intro hn ι b
+    have : Nontrivial (KM M) := by
+      refine ⟨⟨1, 0, fun h => ?_⟩⟩
+      have := congrFun (congrArg KM.hat h) ⟨0, Nat.pos_of_ne_zero hn⟩
+      simp at this
+    rw [b.mk_eq_rank'', rank_fin_fun]
+  · intro hn
+    have : Nontrivial (KM M) := by
+      refine ⟨⟨1, 0, fun h => ?_⟩⟩
+      have := congrFun (congrArg KM.hat h) ⟨0, Nat.pos_of_ne_zero hn⟩
+      simp at this
+    exact Module.finrank_fin_fun (KM M)
 
 /-- **Eq. (8)**: the `⋆_M`-dot product `U ·_M V := ∑ᵢ uᵢ* ⋆_M vᵢ ∈ 𝕂_M`. -/
 def dotM {m : ℕ} (U V : Fin m → KM M) : KM M := ∑ i, star (U i) * V i
+
+/-- The key step in the proof of Theorem 20: for all `u ∈ 𝕂_M`, `u* ⋆_M u ≥_M 0`, and
+`u* ⋆_M u = 0` iff `u = 0`. -/
+theorem star_mul_self_nonneg (M : Matrix (Fin n) (Fin n) ℂ) [Fact (Admissible M)]
+    (u : KM M) : 0 ≤ star u * u ∧ (star u * u = 0 ↔ u = 0) := by
+  have hz : ∀ j, (star u * u).hat j = ((Complex.normSq (u.hat j) : ℝ) : ℂ) := by
+    intro j
+    rw [KM.hat_mul, KM.hat_star, Pi.mul_apply, Pi.star_apply, mul_comm]
+    exact Complex.mul_conj _
+  refine ⟨fun j => ?_, ⟨fun h => ?_, fun h => by rw [h, star_zero, zero_mul]⟩⟩
+  · rw [sub_zero, hz j]
+    exact ⟨Complex.ofReal_im _, by simpa using Complex.normSq_nonneg _⟩
+  · apply KM.hat_injective
+    funext j
+    have := congrFun (congrArg KM.hat h) j
+    rw [hz j, KM.hat_zero, Pi.zero_apply, Complex.ofReal_eq_zero, Complex.normSq_eq_zero] at this
+    rw [this, KM.hat_zero, Pi.zero_apply]
 
 /-- **Theorem 20.** For all `U, V, W ∈ 𝕂_M^m` and `r, s ∈ 𝕂_M`, the `·_M` product satisfies:
 * `⋆_M`-conjugate symmetry: `U ·_M V = (V ·_M U)*`;
@@ -63,12 +93,36 @@ theorem theorem20 (M : Matrix (Fin n) (Fin n) ℂ) [Fact (Admissible M)] {m : �
     dotM U V = star (dotM V U) ∧
     dotM U (r • V + s • W) = r * dotM U V + s * dotM U W ∧
     (0 ≤ dotM U U ∧ (dotM U U = 0 ↔ U = 0)) := by
-  sorry
-
-/-- The key step in the proof of Theorem 20: for all `u ∈ 𝕂_M`, `u* ⋆_M u ≥_M 0`, and
-`u* ⋆_M u = 0` iff `u = 0`. -/
-theorem star_mul_self_nonneg (M : Matrix (Fin n) (Fin n) ℂ) [Fact (Admissible M)]
-    (u : KM M) : 0 ≤ star u * u ∧ (star u * u = 0 ↔ u = 0) := by
-  sorry
+  refine ⟨?_, ?_, ?_⟩
+  · simp only [dotM, star_sum, star_mul, star_star]
+  · simp only [dotM, Pi.add_apply, Pi.smul_apply, smul_eq_mul, mul_add, Finset.mul_sum,
+      Finset.sum_add_distrib]
+    congr 1 <;> exact Finset.sum_congr rfl fun i _ => by ring
+  · have hnn : ∀ i, 0 ≤ star (U i) * U i := fun i => (star_mul_self_nonneg M (U i)).1
+    have hsum : ∀ j, (dotM U U).hat j = ∑ i, (star (U i) * U i).hat j := by
+      intro j
+      simp only [dotM]
+      rw [show (∑ i, star (U i) * U i).hat = ∑ i, (star (U i) * U i).hat from
+        map_sum (⟨⟨KM.hat, KM.hat_zero⟩, KM.hat_add⟩ : KM M →+ (Fin n → ℂ)) _ _]
+      simp
+    refine ⟨fun j => ?_, ⟨fun h => ?_, fun h => by simp [dotM, h]⟩⟩
+    · rw [sub_zero, hsum j, Complex.im_sum, Complex.re_sum]
+      refine ⟨Finset.sum_eq_zero fun i _ => ?_, Finset.sum_nonneg fun i _ => ?_⟩
+      · simpa using (hnn i j).1
+      · simpa using (hnn i j).2
+    · funext i
+      apply ((star_mul_self_nonneg M (U i)).2).mp
+      apply KM.hat_injective
+      funext j
+      have h0 := congrFun (congrArg KM.hat h) j
+      rw [hsum j, KM.hat_zero, Pi.zero_apply] at h0
+      have hre := congrArg Complex.re h0
+      rw [Complex.re_sum, Complex.zero_re] at hre
+      have hnn' : ∀ k ∈ Finset.univ, 0 ≤ ((star (U k) * U k).hat j).re := fun k _ => by
+        simpa using (hnn k j).2
+      have hk := (Finset.sum_eq_zero_iff_of_nonneg hnn').mp hre i (Finset.mem_univ _)
+      have him : ((star (U i) * U i).hat j).im = 0 := by simpa using (hnn i j).1
+      rw [KM.hat_zero, Pi.zero_apply]
+      exact Complex.ext hk him
 
 end Tubal
