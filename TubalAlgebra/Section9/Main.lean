@@ -78,12 +78,13 @@ theorem TubalRing.winv_eq_eq7 (T : TubalRing n) (M : Matrix (Fin n) (Fin n) ℂ)
   rw [← T.winv_unique a w h1 h2, hw, KM.toC_vec_weakInv]
 
 /-- The two definitions of the weak inverse coincide for every tubal ring: with `M` from
-Theorem 11. -/
+Theorem 11 (an invertible `M` with `a · b = a ⋆_M b`), `a⁻ = M⁻¹ (M a)⁺`. -/
 theorem TubalRing.exists_winv_eq_eq7 (T : TubalRing n) :
     ∃ M : Matrix (Fin n) (Fin n) ℂ, IsUnit M ∧
+      (∀ a b : Fin n → ℝ, toC (T.mul a b) = starMC M (toC a) (toC b)) ∧
       ∀ a : Fin n → ℝ, toC (T.winv a) = M⁻¹ *ᵥ pinvVec (M *ᵥ toC a) := by
   obtain ⟨M, hM, h⟩ := theorem11 T
-  exact ⟨M, hM, fun a => T.winv_eq_eq7 M hM h a⟩
+  exact ⟨M, hM, h, fun a => T.winv_eq_eq7 M hM h a⟩
 
 /-- "As Example 4 shows, the last theorem does not hold if we restrict `M` to be real": for
 the tubal ring of complex numbers on `ℝ²`, no real `M` works. -/
