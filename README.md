@@ -38,3 +38,10 @@ python3 scripts/axiom_audit.py   # check that no non-standard axiom (or sorry) i
 | `TubalAlgebra/Section9/*.lean` | Section 9: Lemma 38 – Proposition 62, Theorem 11 |
 | `TubalAlgebra/Hilbert.lean` | Propositions 70, 71 |
 | `TubalAlgebra/Examples/*.lean` | Examples 4, 14–18, Eq. (3), 67–69, Algorithm 1 |
+
+## Candidate contributions to NLAlib
+
+`ForNLALib/` is a separate Lake package (Lean/Mathlib v4.33.1, depending on
+[NLAlib](https://github.com/NLA-lib/NLAlib)) that collects the general numerical-linear-algebra
+results of this formalization, rewritten in NLAlib's conventions as proposals for upstreaming.
+The formalization does not depend on it; see `ForNLALib/README.md`.

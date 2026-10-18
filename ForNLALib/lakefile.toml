@@ -1,0 +1,22 @@
+name = "ForNLALib"
+defaultTargets = ["ForNLALib"]
+
+# Candidate contributions to NLAlib (https://github.com/NLA-lib/NLAlib), written against NLAlib's
+# API and conventions. This is a separate Lake package: NLAlib pins Lean/Mathlib v4.33.1, while
+# the formalization in the parent directory uses v4.34.1. Same options as NLAlib's lakefile.
+[leanOptions]
+autoImplicit = false
+pp.unicode.fun = true
+maxSynthPendingDepth = 3
+linter.missingDocs = true
+weak.linter.mathlibStandardSet = true
+weak.linter.style.header = true
+
+# NLAlib at a fixed commit; Mathlib v4.33.1 comes with it.
+[[require]]
+name = "NLAlib"
+git = "https://github.com/NLA-lib/NLAlib"
+rev = "f4e1255fe3a94a429684488ddafe84ee195fcfcf"
+
+[[lean_lib]]
+name = "ForNLALib"
