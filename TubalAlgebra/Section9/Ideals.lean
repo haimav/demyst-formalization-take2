@@ -38,6 +38,42 @@ structure IsTubalSubring (V : Submodule ℝ (Fin n → ℝ)) : Prop where
   /-- `V` is an ideal in `(ℝⁿ, +, ·)`. -/
   isIdeal : ∀ x ∈ V, ∀ a : Fin n → ℝ, T.mul a x ∈ V
 
+/-- **Definition 55, unpacked.** A tubal sub-ring `(V, +, ·)` is a commutative ring and an
+associative `ℝ`-algebra in its own right: `V` carries a `CommRing` structure and an
+`Algebra ℝ` structure whose addition is the vector addition, whose product is the product `·`
+of `T`, whose scalar multiplication is the usual scalar-vector product, and whose unit is a
+unit element `e_V` of `V`; this ring is moreover von Neumann regular.
+
+(The unit `e_V` is in general not the unit of `(ℝⁿ, +, ·)`: an ideal containing that unit is
+all of `ℝⁿ`. So `V` is an algebra on its own, not a `Subalgebra` of `(ℝⁿ, +, ·)`.) -/
+theorem IsTubalSubring.exists_commRing_algebra {V : Submodule ℝ (Fin n → ℝ)}
+    (hV : T.IsTubalSubring V) :
+    ∃ (R : CommRing V) (A : @Algebra ℝ V _ R.toSemiring),
+      letI := R; letI := A;
+      (∀ x y : V, ((x + y : V) : Fin n → ℝ) = x + y) ∧
+      (∀ x y : V, ((x * y : V) : Fin n → ℝ) = T.mul x y) ∧
+      (∀ (r : ℝ) (x : V), ((r • x : V) : Fin n → ℝ) = r • (x : Fin n → ℝ)) ∧
+      T.IsUnitOf V ((1 : V) : Fin n → ℝ) ∧
+      IsVonNeumannRegularRing V := by
+  obtain ⟨e, heV, he⟩ := hV.unital
+  let R : CommRing V :=
+    { (inferInstance : AddCommGroup V) with
+      mul := fun x y => ⟨T.mul x y, hV.mul_mem _ x.2 _ y.2⟩
+      one := ⟨e, heV⟩
+      mul_assoc := fun x y z => Subtype.ext (T.mul_assoc x y z)
+      one_mul := fun x => Subtype.ext (he x x.2).1
+      mul_one := fun x => Subtype.ext (he x x.2).2
+      left_distrib := fun x y z => Subtype.ext (T.left_distrib x y z)
+      right_distrib := fun x y z => Subtype.ext (T.right_distrib x y z)
+      zero_mul := fun x => Subtype.ext (T.zero_mul x)
+      mul_zero := fun x => Subtype.ext (T.mul_zero x)
+      mul_comm := fun x y => Subtype.ext (T.mul_comm x y) }
+  let A : Algebra ℝ V := Algebra.ofModule
+    (fun r x y => Subtype.ext (T.smul_mul r x y)) (fun r x y => Subtype.ext (T.mul_smul r x y))
+  refine ⟨R, A, fun _ _ => rfl, fun _ _ => rfl, fun _ _ => rfl, ⟨heV, he⟩, fun a => ?_⟩
+  obtain ⟨x, hx, hax⟩ := hV.vonNeumann a a.2
+  exact ⟨⟨x, hx⟩, Subtype.ext hax⟩
+
 /-- **Definition 56.** For `a ∈ ℝⁿ`, the principal ideal associated with `a` is
 `(a) := {x · a : x ∈ ℝⁿ}`. -/
 def principalSet (a : Fin n → ℝ) : Set (Fin n → ℝ) := {y | ∃ x, y = T.mul x a}

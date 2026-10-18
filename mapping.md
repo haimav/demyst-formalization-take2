@@ -9,7 +9,7 @@ Section 9 in `Tubal.TubalRing` ([TubalAlgebra/TubalRing.lean:34](TubalAlgebra/Tu
 `admit`, no `native_decide`, and **no axiom beyond Lean's standard `propext`,
 `Classical.choice`, `Quot.sound`** (not even for the classical results the paper cites: the
 Frobenius theorem, simultaneous diagonalization, matrix SVD and the Eckart–Young theorem are all
-proved). `python3 scripts/axiom_audit.py` runs `#print axioms` on all 488 public declarations
+proved). `python3 scripts/axiom_audit.py` runs `#print axioms` on all 489 public declarations
 and checks this.
 
 Every numbered result of the paper is listed below, in order, with the Lean declaration(s) that
@@ -56,7 +56,7 @@ those of the paper.
 | Eq. (5) | `starMC` ([TubalAlgebra/Defs.lean:72](TubalAlgebra/Defs.lean#L72)) | YES |
 | **Lemma 2** | `lemma2` ([TubalAlgebra/Realness.lean:409](TubalAlgebra/Realness.lean#L409)) (identical to Lemma 65) |  YES |
 | **Theorem 3** | `theorem3` ([TubalAlgebra/KMRing.lean:203](TubalAlgebra/KMRing.lean#L203)) (existence of a `CommRing` structure on `Fin n → ℝ` whose `+` is vector addition and whose product is `⋆_M`), `theorem3_KM` ([TubalAlgebra/KMRing.lean:213](TubalAlgebra/KMRing.lean#L213)), instance `KM.instCommRing` ([TubalAlgebra/KMRing.lean:160](TubalAlgebra/KMRing.lean#L160)) | YES |
-| **Example 4** | `example4` ([TubalAlgebra/Examples/Section3.lean:59](TubalAlgebra/Examples/Section3.lean#L59)), `M4` ([TubalAlgebra/Examples/Section3.lean:48](TubalAlgebra/Examples/Section3.lean#L48)), `M4_admissible` ([TubalAlgebra/Examples/Section3.lean:65](TubalAlgebra/Examples/Section3.lean#L65)), `example4_isField` ([TubalAlgebra/Examples/Section3.lean:87](TubalAlgebra/Examples/Section3.lean#L87)), `complexTubal` ([TubalAlgebra/Examples/Section3.lean:173](TubalAlgebra/Examples/Section3.lean#L173)), `example4_no_real_M` ([TubalAlgebra/Examples/Section3.lean:146](TubalAlgebra/Examples/Section3.lean#L146)); "the last theorem does not hold if we restrict `M` to be real": `theorem11_not_real` ([TubalAlgebra/Section9/Main.lean:90](TubalAlgebra/Section9/Main.lean#L90)) | YES |
+| **Example 4** | `example4` ([TubalAlgebra/Examples/Section3.lean:59](TubalAlgebra/Examples/Section3.lean#L59)), `M4` ([TubalAlgebra/Examples/Section3.lean:48](TubalAlgebra/Examples/Section3.lean#L48)), `M4_admissible` ([TubalAlgebra/Examples/Section3.lean:65](TubalAlgebra/Examples/Section3.lean#L65)), `example4_isField` ([TubalAlgebra/Examples/Section3.lean:87](TubalAlgebra/Examples/Section3.lean#L87)), `complexTubal` ([TubalAlgebra/Examples/Section3.lean:173](TubalAlgebra/Examples/Section3.lean#L173)), `example4_no_real_M` ([TubalAlgebra/Examples/Section3.lean:146](TubalAlgebra/Examples/Section3.lean#L146)); "the last theorem does not hold if we restrict `M` to be real": `theorem11_not_real` ([TubalAlgebra/Section9/Main.lean:91](TubalAlgebra/Section9/Main.lean#L91)) | YES |
 | **Proposition 5** ⚠ | `prop5` ([TubalAlgebra/NotField.lean:21](TubalAlgebra/NotField.lean#L21)); `dim_ℝ 𝕂_M = n`: `KM.finrank_eq` ([TubalAlgebra/KMRing.lean:337](TubalAlgebra/KMRing.lean#L337)) | YES |
 | partial order `≤_M` ("easy to verify") | `KM.le_def` ([TubalAlgebra/Defs.lean:200](TubalAlgebra/Defs.lean#L200)), `le_isPartialOrder` ([TubalAlgebra/KMRing.lean:235](TubalAlgebra/KMRing.lean#L235)) | YES |
 | Eq. (6) (`a* = M⁻¹ conj(Ma)`) | `Star (KM M)`, `KM.toC_vec_star` ([TubalAlgebra/KMRing.lean:114](TubalAlgebra/KMRing.lean#L114)), `KM.hat_star` ([TubalAlgebra/KMRing.lean:130](TubalAlgebra/KMRing.lean#L130)) | YES |
@@ -218,6 +218,10 @@ those of the paper.
 13. **Definition 55**: commutativity, associativity, distributivity and ℝ-algebra compatibility
     of `(V, +, ·)` are inherited from the ambient tubal ring, so `IsTubalSubring` ([TubalAlgebra/Section9/Ideals.lean:31](TubalAlgebra/Section9/Ideals.lean#L31)) only requires
     closure, a unit, von Neumann regularity inside `V`, and the ideal property.
+    `IsTubalSubring.exists_commRing_algebra` ([TubalAlgebra/Section9/Ideals.lean:49](TubalAlgebra/Section9/Ideals.lean#L49)) confirms that these conditions make `(V, +, ·)` a
+    commutative, von Neumann regular ring and an associative `ℝ`-algebra with unit `e_V`. This is
+    an algebra in its own right, not a Mathlib `Subalgebra` of `(ℝⁿ, +, ·)`: that would force
+    `e ∈ V` and hence `V = ℝⁿ`.
 14. **Division ring (Sec. 9.4) / Lemma 60**: as recalled in Section 9.4, "a ring is called a
     division ring if every non-zero element has a multiplicative inverse" (no non-triviality
     requirement); with this reading Lemma 60 is true also for `V = {0}`.
@@ -250,7 +254,7 @@ those of the paper.
 ## Verification
 
 * `lake build` — builds the whole library without errors or `sorry` warnings.
-* `python3 scripts/axiom_audit.py` — `#print axioms` for all 488 public theorems, lemmas,
+* `python3 scripts/axiom_audit.py` — `#print axioms` for all 489 public theorems, lemmas,
   definitions and instances; all depend only on `propext`, `Classical.choice`, `Quot.sound`.
 * Statement faithfulness was independently reviewed against the paper (one reviewer per
   section plus a completeness critic, each finding adversarially re-verified); the
