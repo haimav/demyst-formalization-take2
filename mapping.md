@@ -146,39 +146,39 @@ those of the paper.
 | **Lemma 52** | `TubalRing.lemma52` ([TubalAlgebra/Section9/Diagonalizable.lean:101](TubalAlgebra/Section9/Diagonalizable.lean#L101)) | YES |
 | **Lemma 53** | `TubalRing.lemma53` ([TubalAlgebra/Section9/Diagonalizable.lean:114](TubalAlgebra/Section9/Diagonalizable.lean#L114)) | YES |
 | **Proposition 54** | `TubalRing.prop54` ([TubalAlgebra/Section9/Diagonalizable.lean:160](TubalAlgebra/Section9/Diagonalizable.lean#L160)) | YES |
-| **Definition 55** | `TubalRing.IsTubalSubring` ([TubalAlgebra/Section9/Ideals.lean:31](TubalAlgebra/Section9/Ideals.lean#L31)) |  |
-| **Definition 56** | `TubalRing.principalSet` ([TubalAlgebra/Section9/Ideals.lean:43](TubalAlgebra/Section9/Ideals.lean#L43)), `TubalRing.principal` ([TubalAlgebra/Section9/Ideals.lean:85](TubalAlgebra/Section9/Ideals.lean#L85)) |  |
-| **Lemma 57** | `TubalRing.lemma57` ([TubalAlgebra/Section9/Ideals.lean:47](TubalAlgebra/Section9/Ideals.lean#L47)) |  |
-| **Lemma 58** | `TubalRing.lemma58` ([TubalAlgebra/Section9/Ideals.lean:117](TubalAlgebra/Section9/Ideals.lean#L117)) |  |
-| **Lemma 59** | `TubalRing.lemma59` ([TubalAlgebra/Section9/Ideals.lean:135](TubalAlgebra/Section9/Ideals.lean#L135)); text after it ("proper subsets, lower dimension"): `finrank_principal_lt` ([TubalAlgebra/Section9/Ideals.lean:172](TubalAlgebra/Section9/Ideals.lean#L172)) |  |
-| division ring / tubal sub-field (Sec. 9.4) | `TubalRing.IsDivisionSubring` ([TubalAlgebra/Section9/Ideals.lean:215](TubalAlgebra/Section9/Ideals.lean#L215)), `TubalRing.IsTubalSubfield` ([TubalAlgebra/Section9/Ideals.lean:219](TubalAlgebra/Section9/Ideals.lean#L219)) |  |
-| **Lemma 60** | `TubalRing.lemma60` ([TubalAlgebra/Section9/Ideals.lean:225](TubalAlgebra/Section9/Ideals.lean#L225)) |  |
-| **Corollary 61** | `TubalRing.cor61` ([TubalAlgebra/Section9/Ideals.lean:273](TubalAlgebra/Section9/Ideals.lean#L273)) |  |
-| **Proposition 62** | `TubalRing.prop62` ([TubalAlgebra/Section9/SubField.lean:84](TubalAlgebra/Section9/SubField.lean#L84)) |  |
-| Section 9.6 (bringing it together) | `TubalRing.isDiagonalizableRing` ([TubalAlgebra/Section9/Main.lean:21](TubalAlgebra/Section9/Main.lean#L21)), `theorem11` ([TubalAlgebra/Section9/Main.lean:44](TubalAlgebra/Section9/Main.lean#L44)) |  |
+| **Definition 55** | `TubalRing.IsTubalSubring` ([TubalAlgebra/Section9/Ideals.lean:31](TubalAlgebra/Section9/Ideals.lean#L31)) | YES |
+| **Definition 56** | `TubalRing.principalSet` ([TubalAlgebra/Section9/Ideals.lean:43](TubalAlgebra/Section9/Ideals.lean#L43)), `TubalRing.principal` ([TubalAlgebra/Section9/Ideals.lean:85](TubalAlgebra/Section9/Ideals.lean#L85)) | YES |
+| **Lemma 57** | `TubalRing.lemma57` ([TubalAlgebra/Section9/Ideals.lean:47](TubalAlgebra/Section9/Ideals.lean#L47)) | YES |
+| **Lemma 58** | `TubalRing.lemma58` ([TubalAlgebra/Section9/Ideals.lean:117](TubalAlgebra/Section9/Ideals.lean#L117)) | YES |
+| **Lemma 59** | `TubalRing.lemma59` ([TubalAlgebra/Section9/Ideals.lean:135](TubalAlgebra/Section9/Ideals.lean#L135)); text after it ("proper subsets, lower dimension"): `finrank_principal_lt` ([TubalAlgebra/Section9/Ideals.lean:172](TubalAlgebra/Section9/Ideals.lean#L172)) | YES |
+| division ring / tubal sub-field (Sec. 9.4) | `TubalRing.IsDivisionSubring` ([TubalAlgebra/Section9/Ideals.lean:215](TubalAlgebra/Section9/Ideals.lean#L215)), `TubalRing.IsTubalSubfield` ([TubalAlgebra/Section9/Ideals.lean:219](TubalAlgebra/Section9/Ideals.lean#L219)) | YES |
+| **Lemma 60** | `TubalRing.lemma60` ([TubalAlgebra/Section9/Ideals.lean:225](TubalAlgebra/Section9/Ideals.lean#L225)) | YES |
+| **Corollary 61** | `TubalRing.cor61` ([TubalAlgebra/Section9/Ideals.lean:273](TubalAlgebra/Section9/Ideals.lean#L273)) | YES |
+| **Proposition 62** | `TubalRing.prop62` ([TubalAlgebra/Section9/SubField.lean:84](TubalAlgebra/Section9/SubField.lean#L84)) | YES |
+| Section 9.6 (bringing it together) | `TubalRing.isDiagonalizableRing` ([TubalAlgebra/Section9/Main.lean:21](TubalAlgebra/Section9/Main.lean#L21)), `theorem11` ([TubalAlgebra/Section9/Main.lean:44](TubalAlgebra/Section9/Main.lean#L44)) | YES |
 
 ## Section 10: Additional proofs
 
 | Paper | Lean declaration (file:line) | Human Verified? |
 |---|---|---|
-| **Lemma 63** | `lemma63` ([TubalAlgebra/Realness.lean:246](TubalAlgebra/Realness.lean#L246)) |  |
-| **Lemma 64** | `lemma64` ([TubalAlgebra/Realness.lean:312](TubalAlgebra/Realness.lean#L312)) |  |
-| **Lemma 65** | `lemma65` ([TubalAlgebra/Realness.lean:336](TubalAlgebra/Realness.lean#L336)) |  |
-| Proof of Lemma 7 | `lemma7` ([TubalAlgebra/Realness.lean:416](TubalAlgebra/Realness.lean#L416)) |  |
-| `M_{n,m}`, `M_{n,m}⁻¹`, `𝕂_{n,m}` | `canonicalM` ([TubalAlgebra/Canonical.lean:21](TubalAlgebra/Canonical.lean#L21)), `canonicalMInv` ([TubalAlgebra/Canonical.lean:30](TubalAlgebra/Canonical.lean#L30)), `canonicalM_inv` ([TubalAlgebra/Canonical.lean:308](TubalAlgebra/Canonical.lean#L308)), `canonicalM_admissible` ([TubalAlgebra/Canonical.lean:314](TubalAlgebra/Canonical.lean#L314)), `realness_canonicalM` ([TubalAlgebra/Canonical.lean:326](TubalAlgebra/Canonical.lean#L326)) |  |
-| **Proposition 66** | `prop66` ([TubalAlgebra/Canonical.lean:351](TubalAlgebra/Canonical.lean#L351)); with conjugation: `prop66_star` ([TubalAlgebra/Canonical.lean:360](TubalAlgebra/Canonical.lean#L360)) |  |
+| **Lemma 63** | `lemma63` ([TubalAlgebra/Realness.lean:246](TubalAlgebra/Realness.lean#L246)) | YES  |
+| **Lemma 64** | `lemma64` ([TubalAlgebra/Realness.lean:312](TubalAlgebra/Realness.lean#L312)) | YES |
+| **Lemma 65** | `lemma65` ([TubalAlgebra/Realness.lean:336](TubalAlgebra/Realness.lean#L336)) | YES |
+| Proof of Lemma 7 | `lemma7` ([TubalAlgebra/Realness.lean:416](TubalAlgebra/Realness.lean#L416)) | YES |
+| `M_{n,m}`, `M_{n,m}⁻¹`, `𝕂_{n,m}` | `canonicalM` ([TubalAlgebra/Canonical.lean:21](TubalAlgebra/Canonical.lean#L21)), `canonicalMInv` ([TubalAlgebra/Canonical.lean:30](TubalAlgebra/Canonical.lean#L30)), `canonicalM_inv` ([TubalAlgebra/Canonical.lean:308](TubalAlgebra/Canonical.lean#L308)), `canonicalM_admissible` ([TubalAlgebra/Canonical.lean:314](TubalAlgebra/Canonical.lean#L314)), `realness_canonicalM` ([TubalAlgebra/Canonical.lean:326](TubalAlgebra/Canonical.lean#L326)) | YES |
+| **Proposition 66** | `prop66` ([TubalAlgebra/Canonical.lean:351](TubalAlgebra/Canonical.lean#L351)); with conjugation: `prop66_star` ([TubalAlgebra/Canonical.lean:360](TubalAlgebra/Canonical.lean#L360)) | YES |
 
 ## Appendices
 
 | Paper | Lean declaration (file:line) | Human Verified? |
 |---|---|---|
-| **Example 67** | `AppendixA.example67` ([TubalAlgebra/Examples/AppendixA.lean:179](TubalAlgebra/Examples/AppendixA.lean#L179)), `AppendixA.example67_step3` ([TubalAlgebra/Examples/AppendixA.lean:255](TubalAlgebra/Examples/AppendixA.lean#L255)) |  |
-| **Example 68** | `AppendixA.example68` ([TubalAlgebra/Examples/AppendixA.lean:310](TubalAlgebra/Examples/AppendixA.lean#L310)), `AppendixA.hadamard2_eq_smul_unitary` ([TubalAlgebra/Examples/AppendixA.lean:292](TubalAlgebra/Examples/AppendixA.lean#L292)), `AppendixA.example68_literal_false` ([TubalAlgebra/Examples/AppendixA.lean:354](TubalAlgebra/Examples/AppendixA.lean#L354)) |  |
-| Appendix B, weak inverses / nilpotents | `not_vonNeumann_has_nilpotent` ([TubalAlgebra/Examples/AppendixB.lean:486](TubalAlgebra/Examples/AppendixB.lean#L486)) |  |
-| **Example 69** | `example69` ([TubalAlgebra/Examples/AppendixB.lean:19](TubalAlgebra/Examples/AppendixB.lean#L19)) |  |
-| **Algorithm 1** ⚠ | `algorithm1` ([TubalAlgebra/Examples/AppendixB.lean:75](TubalAlgebra/Examples/AppendixB.lean#L75)), `algorithm1_correct` ([TubalAlgebra/Examples/AppendixB.lean:291](TubalAlgebra/Examples/AppendixB.lean#L291)), `algorithm1_exists_good_x` ([TubalAlgebra/Examples/AppendixB.lean:315](TubalAlgebra/Examples/AppendixB.lean#L315)), `algorithm1_ae` ([TubalAlgebra/Examples/AppendixB.lean:329](TubalAlgebra/Examples/AppendixB.lean#L329)) |  |
-| **Proposition 70** | `prop70` ([TubalAlgebra/Hilbert.lean:74](TubalAlgebra/Hilbert.lean#L74)) |  |
-| **Proposition 71** ⚠ | `prop71` ([TubalAlgebra/Hilbert.lean:91](TubalAlgebra/Hilbert.lean#L91)); "easy to build counter examples": `eq9_fails_in_general` ([TubalAlgebra/Hilbert.lean:114](TubalAlgebra/Hilbert.lean#L114)) |  |
+| **Example 67** | `AppendixA.example67` ([TubalAlgebra/Examples/AppendixA.lean:179](TubalAlgebra/Examples/AppendixA.lean#L179)), `AppendixA.example67_step3` ([TubalAlgebra/Examples/AppendixA.lean:255](TubalAlgebra/Examples/AppendixA.lean#L255)) | YES |
+| **Example 68** | `AppendixA.example68` ([TubalAlgebra/Examples/AppendixA.lean:310](TubalAlgebra/Examples/AppendixA.lean#L310)), `AppendixA.hadamard2_eq_smul_unitary` ([TubalAlgebra/Examples/AppendixA.lean:292](TubalAlgebra/Examples/AppendixA.lean#L292)), `AppendixA.example68_literal_false` ([TubalAlgebra/Examples/AppendixA.lean:354](TubalAlgebra/Examples/AppendixA.lean#L354)) | YES |
+| Appendix B, weak inverses / nilpotents | `not_vonNeumann_has_nilpotent` ([TubalAlgebra/Examples/AppendixB.lean:486](TubalAlgebra/Examples/AppendixB.lean#L486)) | YES |
+| **Example 69** | `example69` ([TubalAlgebra/Examples/AppendixB.lean:19](TubalAlgebra/Examples/AppendixB.lean#L19)) | YES |
+| **Algorithm 1** ⚠ | `algorithm1` ([TubalAlgebra/Examples/AppendixB.lean:75](TubalAlgebra/Examples/AppendixB.lean#L75)), `algorithm1_correct` ([TubalAlgebra/Examples/AppendixB.lean:291](TubalAlgebra/Examples/AppendixB.lean#L291)), `algorithm1_exists_good_x` ([TubalAlgebra/Examples/AppendixB.lean:315](TubalAlgebra/Examples/AppendixB.lean#L315)), `algorithm1_ae` ([TubalAlgebra/Examples/AppendixB.lean:329](TubalAlgebra/Examples/AppendixB.lean#L329)) | YES |
+| **Proposition 70** | `prop70` ([TubalAlgebra/Hilbert.lean:74](TubalAlgebra/Hilbert.lean#L74)) | YES |
+| **Proposition 71** ⚠ | `prop71` ([TubalAlgebra/Hilbert.lean:91](TubalAlgebra/Hilbert.lean#L91)); "easy to build counter examples": `eq9_fails_in_general` ([TubalAlgebra/Hilbert.lean:114](TubalAlgebra/Hilbert.lean#L114)) | YES |
 
 ## Deviations from the literal text (all justified)
 
