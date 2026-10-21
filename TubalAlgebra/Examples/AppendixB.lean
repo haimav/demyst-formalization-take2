@@ -483,7 +483,7 @@ a commutative ring over `ℝⁿ` which is not von Neumann regular must have nilp
 i.e. elements `ν ≠ 0` with `ν² = 0`. (The paper's sentence "a commutative ring over `ℝⁿ`
 which is not tubal will be reduced, i.e., has an element `n` such that `n² = 0`" has a typo:
 "reduced" should read "non-reduced", as the "i.e." clause shows.) -/
-theorem not_vonNeumann_has_nilpotent (R : CommAlgOn n)
+theorem not_vonNeumann_has_nilpotent (R : CommAlg On n)
     (h : ¬ ∀ a, ∃ x, a = R.mul (R.mul a x) a) : ∃ ν : Fin n → ℝ, ν ≠ 0 ∧ R.mul ν ν = 0 := by
   by_contra hν
   push Not at hν
