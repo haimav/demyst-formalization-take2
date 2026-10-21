@@ -1,11 +1,16 @@
 # Design note: candidate contributions to NLAlib
 
-Status: implemented in this directory (all statements proved; see `../../README.md`), as a
-draft for the NLAlib maintainer (CONTRIBUTING.md §8). Written against NLAlib commit
-`f4e1255fe3a94a429684488ddafe84ee195fcfcf` (Lean / Mathlib `v4.33.1`).
+Status: draft for the NLAlib maintainer (CONTRIBUTING.md §8). All statements below are already
+implemented and proved, written against NLAlib commit `f4e1255fe3a94a429684488ddafe84ee195fcfcf`
+(Lean / Mathlib `v4.33.1`), in the directory
+[`ForNLALib/`](https://github.com/haimav/demyst-formalization-take2/tree/main/ForNLALib) of
+[`haimav/demyst-formalization-take2`](https://github.com/haimav/demyst-formalization-take2); its
+[README](https://github.com/haimav/demyst-formalization-take2/blob/main/ForNLALib/README.md) says
+how to build it and how it was checked.
 
 The material comes from a Lean formalization of tubal tensor algebra
-(`haimav/demyst-formalization-take2`, commit `7d69f60`, directory `TubalAlgebra/`). That project
+([`haimav/demyst-formalization-take2`](https://github.com/haimav/demyst-formalization-take2),
+commit `7d69f60`, directory `TubalAlgebra/`). That project
 needed a number of general matrix facts that are not specific to tensors. This note proposes the
 ones that NLAlib does not already have, restated in NLAlib's vocabulary (§5.3), interfaces (§5.4)
 and conventions; the tensor-specific material stays in that project.
